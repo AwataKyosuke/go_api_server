@@ -1,7 +1,32 @@
-version: '3' # composeファイルのバーション指定
+version: '3'
 services:
-  app: # service名
-    build: . # ビルドに使用するDockerfileがあるディレクトリ指定
-    tty: true # コンテナの起動永続化
+  api:
+    links:
+      - mysql
+    build:
+      context: .
+      dockerfile: ./docker/api/Dockerfile
     volumes:
-      - .:/go/src/work # マウントディレクトリ指定
+      - ./:/go/src/work
+    ports:
+      - 8888:8888 # 開放するポート
+    command: sh ./start.sh
+  mysql:
+    container_name: mysql
+    build:
+      context: .
+      dockerfile: ./docker/db/Dockerfile
+    # mysqlのホスト名を決める
+    hostname: mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: password
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --skip-character-set-client-handshake
+    volumes:
+      - ./mysql_data:/var/lib/mysql # データ永続化のためのボリューム
+      - ./docker/db/my.conf:/etc/mysql/my.conf
+volumes:
+  mysql_data: # ローカルのディレクトリにデータを保存
