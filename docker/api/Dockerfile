@@ -1,5 +1,5 @@
 # ベースとなるDockerイメージ指定
-FROM golang:1.8
+FROM golang:latest
 
 # Docker上の作業ディレクトリ設定
 WORKDIR /go/src/work
@@ -8,6 +8,9 @@ WORKDIR /go/src/work
 ADD . .
 
 # 必要なパッケージの取得
-RUN apt-get update -qq && apt-get install -y mysql-client vim git
+RUN apt-get update -qq && apt-get install -y mariadb-client vim git
+RUN go get github.com/go-sql-driver/mysql
+RUN go get github.com/ant0ine/go-json-rest/rest
+RUN go get github.com/jinzhu/gorm
 
 RUN go build
