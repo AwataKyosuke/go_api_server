@@ -11,6 +11,8 @@ services:
     ports:
       - 8888:8888 # 開放するポート
     command: sh ./start.sh
+    cap_add:
+      - SYS_PTRACE
   mysql:
     container_name: mysql
     build:
