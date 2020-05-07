@@ -1,6 +1,7 @@
 version: '3'
 services:
   api:
+    container_name: go_api
     links:
       - mysql
     build:
@@ -10,9 +11,9 @@ services:
       - ./:/go/src/work
     ports:
       - 8888:8888 # 開放するポート
-    command: sh ./start.sh
     cap_add:
       - SYS_PTRACE
+    tty: true
   mysql:
     container_name: mysql
     build:
