@@ -2,12 +2,13 @@
 package main
 
 // 必要なライブラリのインポート
-import(
-		"log"
-		"net/http"
-		"github.com/ant0ine/go-json-rest/rest"
-    _ "github.com/go-sql-driver/mysql"
-		"github.com/jinzhu/gorm"
+import (
+	"github.com/ant0ine/go-json-rest/rest"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jinzhu/gorm"
+	"log"
+	"net/http"
+	"time"
 )
 
 // DB接続情報を持つ構造体
@@ -17,16 +18,18 @@ type Impl struct {
 
 // テーブル情報の構造体
 type User struct {
-	Id   int  	`json:id`
-	Name string `json:name`
+	Id          int
+	Username    string
+	Email       string
+	Password    string
+	DeleteFlag  bool
+	CreatedAt   time.Time
+	CreatedUser string
+	UpdatedAt   time.Time
+	UpdatedUser string
 }
 
 func main() {
-
-	// DB周り初期設定
-	i := Impl{}
-	// DBとの接続
-	i.InitDB()
 
 	// おまじない、、
 	api := rest.NewApi()
@@ -34,11 +37,11 @@ func main() {
 
 	// ルーティング設定
 	router, err := rest.MakeRouter(
-			rest.Get("/test", i.GetTestMessage),
-			)
+		rest.Get("/users", GetAllUsers),
+	)
 
-			if err != nil {
-			log.Fatal(err)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// サーバー起動
@@ -51,15 +54,21 @@ func (i *Impl) InitDB() {
 	// エラーオブジェクト
 	var err error
 	// コネクションオープン
-	i.DB, err = gorm.Open("mysql", "root:password@tcp(mysql:3306)/test?parseTime=true&&loc=Asia%2FTokyo&charset=utf8")
+	i.DB, err = gorm.Open("mysql", "root:password@tcp(mysql:3306)/development?parseTime=true&&loc=Asia%2FTokyo&charset=utf8")
 	if err != nil {
-			log.Fatalf("Got error when connect database, the error is '%v'", err)
+		log.Fatalf("Got error when connect database, the error is '%v'", err)
 	}
 	i.DB.LogMode(true)
 }
 
 // /testにアクセスしたさいの処理
-func (i *Impl) GetTestMessage(w rest.ResponseWriter, r *rest.Request) {
+func GetAllUsers(w rest.ResponseWriter, r *rest.Request) {
+
+	// DB周り初期設定
+	i := Impl{}
+
+	// DBとの接続
+	i.InitDB()
 
 	// DBからの検索結果を代入する構造体
 	users := []User{}
