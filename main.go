@@ -37,7 +37,8 @@ func main() {
 
 	// ルーティング設定
 	router, err := rest.MakeRouter(
-		rest.Get("/users", GetAllUsers),
+		rest.Get("/users", GetAllUser),
+		rest.Get("/users/:id", GetUserById),
 	)
 
 	if err != nil {
@@ -62,7 +63,7 @@ func (i *Impl) InitDB() {
 }
 
 // /testにアクセスしたさいの処理
-func GetAllUsers(w rest.ResponseWriter, r *rest.Request) {
+func GetAllUser(w rest.ResponseWriter, r *rest.Request) {
 
 	// DB周り初期設定
 	i := Impl{}
@@ -81,4 +82,25 @@ func GetAllUsers(w rest.ResponseWriter, r *rest.Request) {
 
 	// レスポンスボディを書き込み
 	w.WriteJson(&users)
+}
+
+func GetUserById(w rest.ResponseWriter, r *rest.Request) {
+
+	// DB周り初期設定
+	i := Impl{}
+
+	// DBとの接続
+	i.InitDB()
+
+	// DBからの検索結果を代入する構造体
+	user := User{}
+
+	// 検索実行
+	i.DB.First(&user, r.PathParam("id"))
+
+	// ヘッダーに成功ステータスを書き込む
+	w.WriteHeader(http.StatusOK)
+
+	// レスポンスボディを書き込み
+	w.WriteJson(&user)
 }
