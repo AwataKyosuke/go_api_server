@@ -31,6 +31,13 @@ type DbConfig struct {
 	DBName   string
 }
 
+type DbError struct {
+	TableName      string
+	ParameterKey   string
+	ParameterValue interface{}
+	Message        string
+}
+
 func main() {
 
 	// おまじない、、
@@ -69,7 +76,6 @@ func GetConnection() *gorm.DB {
 	return db
 }
 
-// /testにアクセスしたさいの処理
 func GetAllUser(w rest.ResponseWriter, r *rest.Request) {
 
 	connection := GetConnection()
@@ -80,26 +86,60 @@ func GetAllUser(w rest.ResponseWriter, r *rest.Request) {
 	// 検索実行
 	connection.Find(&users)
 
-	// ヘッダーに成功ステータスを書き込む
-	w.WriteHeader(http.StatusOK)
+	if len(users) == 0 {
 
-	// レスポンスボディを書き込み
-	w.WriteJson(&users)
+		// ヘッダーに失敗ステータスを書き込む
+		w.WriteHeader(http.StatusNotFound)
+
+		// エラー情報
+		dbError := DbError{
+			TableName: "users",
+			Message:   "レコードが1件もありません。",
+		}
+
+		// レスポンスボディを書き込み
+		w.WriteJson(dbError)
+	} else {
+
+		// ヘッダーに成功ステータスを書き込む
+		w.WriteHeader(http.StatusOK)
+
+		// レスポンスボディを書き込み
+		w.WriteJson(&users)
+	}
+
 }
 
 func GetUserById(w rest.ResponseWriter, r *rest.Request) {
 
+	// データベースとのコネクション生成
 	connection := GetConnection()
 
 	// DBからの検索結果を代入する構造体
 	user := User{}
 
 	// 検索実行
-	db.First(&user, r.PathParam("id"))
+	if connection.First(&user, r.PathParam("id")).RecordNotFound() {
 
-	// ヘッダーに成功ステータスを書き込む
-	w.WriteHeader(http.StatusOK)
+		// ヘッダーに失敗ステータスを書き込む
+		w.WriteHeader(http.StatusNotFound)
 
-	// レスポンスボディを書き込み
-	w.WriteJson(&user)
+		// エラー情報
+		dbError := DbError{
+			TableName:      "users",
+			ParameterKey:   "id",
+			ParameterValue: r.PathParam("id"),
+			Message:        "対象のレコードが見つかりませんでした。",
+		}
+
+		// レスポンスボディを書き込み
+		w.WriteJson(dbError)
+	} else {
+
+		// ヘッダーに成功ステータスを書き込む
+		w.WriteHeader(http.StatusOK)
+
+		// レスポンスボディを書き込み
+		w.WriteJson(&user)
+	}
 }
