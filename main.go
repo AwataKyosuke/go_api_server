@@ -3,17 +3,18 @@ package main
 
 // 必要なライブラリのインポート
 import (
-	"github.com/ant0ine/go-json-rest/rest"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/gorm"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/ant0ine/go-json-rest/rest"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jinzhu/gorm"
 )
 
-// テーブル情報の構造体
+// User ユーザー情報
 type User struct {
-	Id          int
+	ID          int
 	Username    string
 	Email       string
 	Password    string
@@ -24,6 +25,7 @@ type User struct {
 	UpdatedUser string
 }
 
+// DbConfig データベース接続情報
 type DbConfig struct {
 	Host     string
 	Username string
@@ -31,6 +33,7 @@ type DbConfig struct {
 	DBName   string
 }
 
+// DbError データベースに関するエラー情報
 type DbError struct {
 	TableName      string
 	ParameterKey   string
@@ -47,7 +50,7 @@ func main() {
 	// ルーティング設定
 	router, err := rest.MakeRouter(
 		rest.Get("/users", GetAllUser),
-		rest.Get("/users/:id", GetUserById),
+		rest.Get("/users/:id", GetUserByID),
 	)
 
 	if err != nil {
@@ -59,6 +62,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8888", api.MakeHandler()))
 }
 
+// GetConnection データベースとのコネクションをオープンする
 func GetConnection() *gorm.DB {
 
 	config := &DbConfig{
@@ -76,6 +80,7 @@ func GetConnection() *gorm.DB {
 	return db
 }
 
+// GetAllUser 全てのユーザー情報を取得する
 func GetAllUser(w rest.ResponseWriter, r *rest.Request) {
 
 	connection := GetConnection()
@@ -110,7 +115,8 @@ func GetAllUser(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
-func GetUserById(w rest.ResponseWriter, r *rest.Request) {
+// GetUserByID IDに一致するユーザーを取得する
+func GetUserByID(w rest.ResponseWriter, r *rest.Request) {
 
 	// データベースとのコネクション生成
 	connection := GetConnection()
