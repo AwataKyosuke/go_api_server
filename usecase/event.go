@@ -23,5 +23,8 @@ func NewEventUseCase(r repository.EventRepository) EventUseCase {
 
 func (u eventUseCase) GetAll() ([]*domain.Event, error) {
 	events, err := u.eventRepository.GetAll()
-	return events, err
+	if err != nil {
+
+	}
+	return events, nil
 }

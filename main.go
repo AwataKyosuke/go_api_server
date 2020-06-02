@@ -19,6 +19,10 @@ func main() {
 	userUseCase := usecase.NewUserUseCase(userPersistence)
 	userHandler := handler.NewUserHandler(userUseCase)
 
+	eventPersistence := persistence.NewEventPresistence()
+	eventUseCase := usecase.NewEventUseCase(eventPersistence)
+	eventHandler := handler.NewEventHandler(eventUseCase)
+
 	// おまじない、、
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
@@ -27,6 +31,7 @@ func main() {
 	router, err := rest.MakeRouter(
 		rest.Get("/users", userHandler.GetAllUser),
 		rest.Get("/users/:id", userHandler.GetUserByID),
+		rest.Get("/events", eventHandler.HandleGetEvent),
 	)
 
 	if err != nil {
