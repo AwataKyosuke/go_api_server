@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/AwataKyosuke/go_api_server/domain"
+	"github.com/AwataKyosuke/go_api_server/domain/model"
 	"github.com/AwataKyosuke/go_api_server/domain/repository"
 )
 
@@ -20,9 +20,9 @@ func NewEventPresistence() repository.EventRepository {
 	return &eventPersistence{}
 }
 
-func (p eventPersistence) GetAll() ([]*domain.Event, error) {
+func (p eventPersistence) GetEvents(start string, end string, keyword string) ([]*model.Event, error) {
 
-	ret := []*domain.Event{}
+	ret := []*model.Event{}
 
 	events, err := getConpassEvent()
 	if err != nil {
@@ -43,7 +43,7 @@ func (p eventPersistence) GetAll() ([]*domain.Event, error) {
 	return ret, nil
 }
 
-func getConpassEvent() ([]*domain.Event, error) {
+func getConpassEvent() ([]*model.Event, error) {
 
 	type apiResponse struct {
 		ResultsStart     int `json:"results_start"`
@@ -97,11 +97,11 @@ func getConpassEvent() ([]*domain.Event, error) {
 
 	}
 
-	event := []*domain.Event{}
+	event := []*model.Event{}
 
 	for i := 0; i < len(apiResp.Events); i++ {
 		tmp := apiResp.Events[i]
-		addEvent := domain.Event{
+		addEvent := model.Event{
 			EventID:     tmp.EventID,
 			Title:       tmp.Title,
 			Description: tmp.Description,
@@ -123,7 +123,7 @@ func getConpassEvent() ([]*domain.Event, error) {
 	return event, nil
 }
 
-func getDoorkeeperEvent() ([]*domain.Event, error) {
+func getDoorkeeperEvent() ([]*model.Event, error) {
 
 	type apiResponse struct {
 		Event struct {
@@ -165,11 +165,11 @@ func getDoorkeeperEvent() ([]*domain.Event, error) {
 
 	}
 
-	event := []*domain.Event{}
+	event := []*model.Event{}
 
 	for i := 0; i < len(apiResp); i++ {
 		tmp := apiResp[i].Event
-		addEvent := domain.Event{
+		addEvent := model.Event{
 			EventID:     tmp.ID,
 			Title:       tmp.Title,
 			Description: tmp.Description,

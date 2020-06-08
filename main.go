@@ -15,23 +15,24 @@ import (
 
 func main() {
 
+	// Dependency Injection[user]
 	userPersistence := persistence.NewUserPersistence()
 	userUseCase := usecase.NewUserUseCase(userPersistence)
 	userHandler := handler.NewUserHandler(userUseCase)
 
+	// Dependency Injection[event]
 	eventPersistence := persistence.NewEventPresistence()
 	eventUseCase := usecase.NewEventUseCase(eventPersistence)
 	eventHandler := handler.NewEventHandler(eventUseCase)
 
-	// おまじない、、
+	// ルーティング設定
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
 
-	// ルーティング設定
 	router, err := rest.MakeRouter(
 		rest.Get("/users", userHandler.GetAllUser),
 		rest.Get("/users/:id", userHandler.GetUserByID),
-		rest.Get("/events", eventHandler.HandleGetEvent),
+		rest.Get("/events", eventHandler.GetEvents),
 	)
 
 	if err != nil {

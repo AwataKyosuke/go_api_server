@@ -1,8 +1,8 @@
 package repository
 
-import "github.com/AwataKyosuke/go_api_server/domain"
+import "github.com/AwataKyosuke/go_api_server/domain/model"
 
 // EventRepository TODO わかりやすいコメントを書きたい
 type EventRepository interface {
-	GetAll() ([]*domain.Event, error)
+	GetEvents(start string, end string, keyword string) ([]*model.Event, error)
 }
