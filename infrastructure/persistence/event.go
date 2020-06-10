@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -76,10 +77,21 @@ func getConpassEvent(parameter repository.EventSearchParameter) ([]*model.Event,
 
 	conpassURL := "https://connpass.com/api/v1/event/?"
 
+	start, _ := time.Parse("20060102", parameter.StartDate)
+	end, _ := time.Parse("20060102", parameter.EndDate)
+	for j := 0; j < int(end.Sub(start).Hours()/24); j++ {
+		conpassURL += "ymd="
+		conpassURL += start.AddDate(0, 0, j).Format("20060102")
+		conpassURL += "&"
+	}
+
 	if len(parameter.Keyword) > 0 {
 		conpassURL += "keyword_or="
 		conpassURL += parameter.Keyword
+		conpassURL += "&"
 	}
+
+	fmt.Println(conpassURL)
 
 	resp, err := http.Get(conpassURL)
 	if err != nil {
@@ -151,7 +163,18 @@ func getDoorkeeperEvent(parameter repository.EventSearchParameter) ([]*model.Eve
 	if len(parameter.Keyword) > 0 {
 		doorkeeperURL += "q="
 		doorkeeperURL += parameter.Keyword
+		doorkeeperURL += "&"
 	}
+
+	doorkeeperURL += "since="
+	doorkeeperURL += parameter.StartDate
+	doorkeeperURL += "&"
+
+	doorkeeperURL += "until="
+	doorkeeperURL += parameter.EndDate
+	doorkeeperURL += "&"
+
+	fmt.Println(doorkeeperURL)
 
 	resp, err := http.Get(doorkeeperURL)
 	if err != nil {

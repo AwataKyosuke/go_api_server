@@ -35,7 +35,13 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 		// TOOD パラメータエラー
 	}
 	start := r.URL.Query().Get("start")
+	if len(start) < 1 {
+		// TOOD パラメータエラー
+	}
 	end := r.URL.Query().Get("end")
+	if len(end) < 1 {
+		// TOOD パラメータエラー
+	}
 	keyword := r.URL.Query().Get("keyword")
 	events, err := h.eventUseCase.GetEventsBySortedForDistance(lat, lon, start, end, keyword)
 	if err != nil {
