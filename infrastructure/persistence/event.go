@@ -3,9 +3,7 @@ package persistence
 import (
 	"encoding/json"
 	"io/ioutil"
-	"math"
 	"net/http"
-	"sort"
 	"strconv"
 	"time"
 
@@ -20,30 +18,28 @@ func NewEventPresistence() repository.EventRepository {
 	return &eventPersistence{}
 }
 
-func (p eventPersistence) GetEvents(start string, end string, keyword string) ([]*model.Event, error) {
+func (p eventPersistence) GetEvents(parameter repository.EventSearchParameter) ([]*model.Event, error) {
 
 	ret := []*model.Event{}
 
-	events, err := getConpassEvent()
+	events, err := getConpassEvent(parameter)
 	if err != nil {
 
 	}
 
 	ret = append(ret, events...)
 
-	events, err = getDoorkeeperEvent()
+	events, err = getDoorkeeperEvent(parameter)
 	if err != nil {
 
 	}
 
 	ret = append(ret, events...)
-
-	sort.Slice(ret, func(i, j int) bool { return ret[i].Distance < ret[j].Distance })
 
 	return ret, nil
 }
 
-func getConpassEvent() ([]*model.Event, error) {
+func getConpassEvent(parameter repository.EventSearchParameter) ([]*model.Event, error) {
 
 	type apiResponse struct {
 		ResultsStart     int `json:"results_start"`
@@ -78,7 +74,12 @@ func getConpassEvent() ([]*model.Event, error) {
 		} `json:"events"`
 	}
 
-	conpassURL := "https://connpass.com/api/v1/event/"
+	conpassURL := "https://connpass.com/api/v1/event/?"
+
+	if len(parameter.Keyword) > 0 {
+		conpassURL += "keyword_or="
+		conpassURL += parameter.Keyword
+	}
 
 	resp, err := http.Get(conpassURL)
 	if err != nil {
@@ -114,16 +115,15 @@ func getConpassEvent() ([]*model.Event, error) {
 			Accepted:    tmp.Accepted,
 			Waiting:     tmp.Waiting,
 		}
-		lat, _ := strconv.ParseFloat(tmp.Lat, 64)
-		lon, _ := strconv.ParseFloat(tmp.Lon, 64)
-		addEvent.Distance = getDistance(lat, lon, 35.690921, 139.70025799999996)
+		addEvent.Lat, _ = strconv.ParseFloat(tmp.Lat, 64)
+		addEvent.Lon, _ = strconv.ParseFloat(tmp.Lon, 64)
 		event = append(event, &addEvent)
 	}
 
 	return event, nil
 }
 
-func getDoorkeeperEvent() ([]*model.Event, error) {
+func getDoorkeeperEvent(parameter repository.EventSearchParameter) ([]*model.Event, error) {
 
 	type apiResponse struct {
 		Event struct {
@@ -146,7 +146,12 @@ func getDoorkeeperEvent() ([]*model.Event, error) {
 		} `json:"event"`
 	}
 
-	doorkeeperURL := "https://api.doorkeeper.jp/events"
+	doorkeeperURL := "https://api.doorkeeper.jp/events?"
+
+	if len(parameter.Keyword) > 0 {
+		doorkeeperURL += "q="
+		doorkeeperURL += parameter.Keyword
+	}
 
 	resp, err := http.Get(doorkeeperURL)
 	if err != nil {
@@ -182,35 +187,10 @@ func getDoorkeeperEvent() ([]*model.Event, error) {
 			Accepted:    tmp.Participants,
 			Waiting:     tmp.Waitlisted,
 		}
-		lat, _ := strconv.ParseFloat(tmp.Lat, 64)
-		lon, _ := strconv.ParseFloat(tmp.Long, 64)
-		addEvent.Distance = getDistance(lat, lon, 35.690921, 139.70025799999996)
+		addEvent.Lat, _ = strconv.ParseFloat(tmp.Lat, 64)
+		addEvent.Lon, _ = strconv.ParseFloat(tmp.Long, 64)
 		event = append(event, &addEvent)
 	}
 
 	return event, nil
-}
-
-func getDistance(lat1 float64, lng1 float64, lat2 float64, lng2 float64) float64 {
-
-	if lat1 == 0 || lng1 == 0 {
-		return 0
-	}
-
-	// 緯度経度をラジアンに変換
-	rlat1 := lat1 * math.Pi / 180
-	rlng1 := lng1 * math.Pi / 180
-	rlat2 := lat2 * math.Pi / 180
-	rlng2 := lng2 * math.Pi / 180
-
-	// 2点の中心角(ラジアン)を求める
-	a :=
-		math.Sin(rlat1)*math.Sin(rlat2) +
-			math.Cos(rlat1)*math.Cos(rlat2)*
-				math.Cos(rlng1-rlng2)
-	rr := math.Acos(a)
-
-	earthRadius := 6378140.
-	distance := earthRadius * rr
-	return distance
 }

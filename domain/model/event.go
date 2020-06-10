@@ -13,6 +13,8 @@ type Event struct {
 	Limit       int
 	Address     string
 	Place       string
+	Lat         float64
+	Lon         float64
 	Distance    float64
 	Accepted    int
 	Waiting     int
