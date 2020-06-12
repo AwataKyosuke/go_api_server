@@ -6,29 +6,30 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// UserUseCase TODO わかりやすいコメントを書きたい
+// UserUseCase Userに関するユースケースを定義するインターフェース
 type UserUseCase interface {
 	GetAll(db *gorm.DB) ([]*model.User, error)
 	GetUserByID(db *gorm.DB, userID int) (*model.User, error)
 }
 
+// userUseCase Userが依存するリポジトリ
 type userUseCase struct {
 	userRepository repository.UserRepository
 }
 
-// NewUserUseCase TODO わかりやすいコメントを書きたい
+// NewUserUseCase 依存性を注入しユースケースを返す
 func NewUserUseCase(r repository.UserRepository) UserUseCase {
 	return &userUseCase{
 		userRepository: r,
 	}
 }
 
+// GetAll 全てのユーザーを取得する
 func (u userUseCase) GetAll(db *gorm.DB) ([]*model.User, error) {
-	users, err := u.userRepository.GetAll(db)
-	return users, err
+	return u.userRepository.GetAll(db)
 }
 
+// GetUserByID ユーザーIDに一致するユーザーを返す
 func (u userUseCase) GetUserByID(db *gorm.DB, userID int) (*model.User, error) {
-	user, err := u.userRepository.GetUserByID(db, userID)
-	return user, err
+	return u.userRepository.GetUserByID(db, userID)
 }

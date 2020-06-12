@@ -1,16 +1,18 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 // User ユーザー情報
 type User struct {
-	ID          int
-	Username    string
-	Email       string
-	Password    string
-	DeleteFlag  bool
-	CreatedAt   time.Time
-	CreatedUser string
-	UpdatedAt   time.Time
-	UpdatedUser string
+	ID          int       `json:"id"`
+	Username    string    `json:"user_name"`
+	Email       string    `json:"email"`
+	Password    string    `json:"password"`
+	DeleteFlag  bool      `json:"delete_flag"`
+	CreatedAt   time.Time `json:"created_at"`
+	CreatedUser string    `json:"created_user"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	UpdatedUser string    `json:"updated_user"`
 }

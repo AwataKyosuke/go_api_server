@@ -1,7 +1,8 @@
-package util
+package calculate
 
 import "math"
 
+// GetDistance 2点の緯度経度の差を求める
 func GetDistance(lat1 float64, lng1 float64, lat2 float64, lng2 float64) float64 {
 
 	if lat1 == 0 || lng1 == 0 || lat2 == 0 || lng2 == 0 {

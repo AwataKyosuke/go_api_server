@@ -2,11 +2,12 @@ package persistence
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/AwataKyosuke/go_api_server/domain/model"
 	"github.com/AwataKyosuke/go_api_server/domain/repository"
@@ -14,34 +15,39 @@ import (
 
 type eventPersistence struct{}
 
-// NewEventPresistence TODO わかりやすいコメントを書きたい
+// NewEventPresistence 依存性を注入しPresistenceを返す
 func NewEventPresistence() repository.EventRepository {
 	return &eventPersistence{}
 }
 
+// GetEvents イベント情報を取得する
 func (p eventPersistence) GetEvents(parameter repository.EventSearchParameter) ([]*model.Event, error) {
 
 	ret := []*model.Event{}
 
+	// TODO 複数キーワードの検索に対応したい
+
+	// conpassからイベントを検索
 	events, err := getConpassEvent(parameter)
 	if err != nil {
-
+		return nil, err
 	}
-
 	ret = append(ret, events...)
 
+	// doorkeeperからイベントを検索
 	events, err = getDoorkeeperEvent(parameter)
 	if err != nil {
-
+		return nil, err
 	}
-
 	ret = append(ret, events...)
 
 	return ret, nil
 }
 
+// getConpassEvent conpassからイベントを検索する
 func getConpassEvent(parameter repository.EventSearchParameter) ([]*model.Event, error) {
 
+	// apiResponse APIのレスポンス
 	type apiResponse struct {
 		ResultsStart     int `json:"results_start"`
 		ResultsReturned  int `json:"results_returned"`
@@ -75,8 +81,10 @@ func getConpassEvent(parameter repository.EventSearchParameter) ([]*model.Event,
 		} `json:"events"`
 	}
 
+	// アクセス先URL
 	conpassURL := "https://connpass.com/api/v1/event/?"
 
+	// 開始日と終了日のパラメータを設定
 	start, _ := time.Parse("20060102", parameter.StartDate)
 	end, _ := time.Parse("20060102", parameter.EndDate)
 	for j := 0; j < int(end.Sub(start).Hours()/24); j++ {
@@ -85,33 +93,34 @@ func getConpassEvent(parameter repository.EventSearchParameter) ([]*model.Event,
 		conpassURL += "&"
 	}
 
+	// キーワードのパラメータを設定
 	if len(parameter.Keyword) > 0 {
 		conpassURL += "keyword_or="
 		conpassURL += parameter.Keyword
 		conpassURL += "&"
 	}
 
-	fmt.Println(conpassURL)
-
+	// リクエスト送信
 	resp, err := http.Get(conpassURL)
 	if err != nil {
-
+		return nil, errors.WithStack(err)
 	}
 
+	// Bodyを読む
 	byteArray, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-
+		return nil, errors.WithStack(err)
 	}
 
+	// JSONを構造体にパース
 	apiResp := apiResponse{}
-
 	err = json.Unmarshal(byteArray, &apiResp)
 	if err != nil {
-
+		return nil, errors.WithStack(err)
 	}
 
+	// 戻り値を作成
 	event := []*model.Event{}
-
 	for i := 0; i < len(apiResp.Events); i++ {
 		tmp := apiResp.Events[i]
 		addEvent := model.Event{
@@ -135,8 +144,10 @@ func getConpassEvent(parameter repository.EventSearchParameter) ([]*model.Event,
 	return event, nil
 }
 
+// getDoorkeeperEvent doorkeeperからイベントを検索する
 func getDoorkeeperEvent(parameter repository.EventSearchParameter) ([]*model.Event, error) {
 
+	// apiResponse APIレスポンス
 	type apiResponse struct {
 		Event struct {
 			Title        string    `json:"title"`
@@ -145,8 +156,8 @@ func getDoorkeeperEvent(parameter repository.EventSearchParameter) ([]*model.Eve
 			EndsAt       time.Time `json:"ends_at"`
 			VenueName    string    `json:"venue_name"`
 			Address      string    `json:"address"`
-			Lat          string    `json:"lat"`
-			Long         string    `json:"long"`
+			Lat          float64   `json:"lat"`
+			Long         float64   `json:"long"`
 			TicketLimit  int       `json:"ticket_limit"`
 			PublishedAt  time.Time `json:"published_at"`
 			UpdatedAt    time.Time `json:"updated_at"`
@@ -158,14 +169,10 @@ func getDoorkeeperEvent(parameter repository.EventSearchParameter) ([]*model.Eve
 		} `json:"event"`
 	}
 
+	// APIアクセス先URL
 	doorkeeperURL := "https://api.doorkeeper.jp/events?"
 
-	if len(parameter.Keyword) > 0 {
-		doorkeeperURL += "q="
-		doorkeeperURL += parameter.Keyword
-		doorkeeperURL += "&"
-	}
-
+	// 開始日と終了日のパラメータを設定
 	doorkeeperURL += "since="
 	doorkeeperURL += parameter.StartDate
 	doorkeeperURL += "&"
@@ -174,27 +181,34 @@ func getDoorkeeperEvent(parameter repository.EventSearchParameter) ([]*model.Eve
 	doorkeeperURL += parameter.EndDate
 	doorkeeperURL += "&"
 
-	fmt.Println(doorkeeperURL)
+	// キーワードのパラメータを設定
+	if len(parameter.Keyword) > 0 {
+		doorkeeperURL += "q="
+		doorkeeperURL += parameter.Keyword
+		doorkeeperURL += "&"
+	}
 
+	// リクエスト送信
 	resp, err := http.Get(doorkeeperURL)
 	if err != nil {
-
+		return nil, errors.WithStack(err)
 	}
 
+	// Bodyを読む
 	byteArray, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-
+		return nil, errors.WithStack(err)
 	}
 
+	// JSONから構造体にパース
 	apiResp := []apiResponse{}
-
 	err = json.Unmarshal(byteArray, &apiResp)
 	if err != nil {
-
+		return nil, errors.WithStack(err)
 	}
 
+	// 戻り値の作成
 	event := []*model.Event{}
-
 	for i := 0; i < len(apiResp); i++ {
 		tmp := apiResp[i].Event
 		addEvent := model.Event{
@@ -206,12 +220,12 @@ func getDoorkeeperEvent(parameter repository.EventSearchParameter) ([]*model.Eve
 			EndedAt:     tmp.EndsAt,
 			Limit:       tmp.TicketLimit,
 			Address:     tmp.Address,
+			Lat:         tmp.Lat,
+			Lon:         tmp.Long,
 			Place:       tmp.VenueName,
 			Accepted:    tmp.Participants,
 			Waiting:     tmp.Waitlisted,
 		}
-		addEvent.Lat, _ = strconv.ParseFloat(tmp.Lat, 64)
-		addEvent.Lon, _ = strconv.ParseFloat(tmp.Long, 64)
 		event = append(event, &addEvent)
 	}
 

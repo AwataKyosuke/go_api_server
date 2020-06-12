@@ -1,20 +1,20 @@
 package persistence
 
 import (
-	"errors"
-
 	"github.com/AwataKyosuke/go_api_server/domain/model"
 	"github.com/AwataKyosuke/go_api_server/domain/repository"
 	"github.com/jinzhu/gorm"
+	"github.com/pkg/errors"
 )
 
 type userPersistence struct{}
 
-// NewUserPersistence TODO わかりやすいコメントを書きたい
+// NewUserPersistence 依存性を注入しPresistenceを返す
 func NewUserPersistence() repository.UserRepository {
 	return &userPersistence{}
 }
 
+// GetAll 全てのユーザーを取得する
 func (p userPersistence) GetAll(db *gorm.DB) ([]*model.User, error) {
 
 	// DBからの検索結果を代入する構造体
@@ -23,13 +23,10 @@ func (p userPersistence) GetAll(db *gorm.DB) ([]*model.User, error) {
 	// 検索実行
 	db.Find(&users)
 
-	if len(users) == 0 {
-		return users, errors.New("not found users")
-	}
-
 	return users, nil
 }
 
+// GetUserByID UserIDに一致するユーザーを1件取得
 func (p userPersistence) GetUserByID(db *gorm.DB, userID int) (*model.User, error) {
 
 	// DBからの検索結果を代入する構造体

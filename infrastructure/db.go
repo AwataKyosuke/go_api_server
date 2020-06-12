@@ -1,6 +1,10 @@
 package infrastructure
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/AwataKyosuke/go_api_server/util/config"
+	"github.com/jinzhu/gorm"
+	"github.com/pkg/errors"
+)
 
 // DB データベース接続情報
 type DB struct {
@@ -11,23 +15,23 @@ type DB struct {
 	Connection *gorm.DB
 }
 
-// NewDB TODO COnfigファイル等に設定値を外出し
+// NewDB データベース情報を取得し新しく作成する
 func NewDB() *DB {
-	config := &DB{
-		Host:     "mysql",
-		Username: "root",
-		Password: "password",
-		DBName:   "development",
+	db := &DB{
+		Host:     config.Config.Host,
+		Username: config.Config.UserName,
+		Password: config.Config.Password,
+		DBName:   config.Config.DBName,
 	}
-	return config
+	return db
 }
 
 // Connect コネクションを生成する
-func Connect(db *DB) *gorm.DB {
+func Connect(db *DB) (*gorm.DB, error) {
 	con, err := gorm.Open("mysql", db.Username+":"+db.Password+"@tcp("+db.Host+")/"+db.DBName+"?parseTime=true&&loc=Asia%2FTokyo&charset=utf8")
 	if err != nil {
-		// TODO エラー処理
+		return nil, errors.WithStack(err)
 	}
 	db.Connection = con
-	return db.Connection
+	return db.Connection, nil
 }

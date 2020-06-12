@@ -1,2 +1,4 @@
 # データベースの内容なので不要
 mysql_data/
+
+server.log

@@ -4,18 +4,18 @@ import "time"
 
 // Event イベント情報
 type Event struct {
-	EventID     int
-	Title       string
-	Description string
-	EventURL    string
-	StartedAt   time.Time
-	EndedAt     time.Time
-	Limit       int
-	Address     string
-	Place       string
-	Lat         float64
-	Lon         float64
-	Distance    float64
-	Accepted    int
-	Waiting     int
+	EventID     int       `json:"event_id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	EventURL    string    `json:"event_url"`
+	StartedAt   time.Time `json:"started_at"`
+	EndedAt     time.Time `json:"ended_at"`
+	Limit       int       `json:"limit"`
+	Address     string    `json:"address"`
+	Place       string    `json:"place"`
+	Lat         float64   `json:"lat"`
+	Lon         float64   `json:"lon"`
+	Distance    float64   `json:"distance"`
+	Accepted    int       `json:"accepted"`
+	Waiting     int       `json:"waiting"`
 }

@@ -3,27 +3,32 @@ package main
 
 // 必要なライブラリのインポート
 import (
-	"log"
 	"net/http"
 
 	"github.com/AwataKyosuke/go_api_server/infrastructure/persistence"
 	"github.com/AwataKyosuke/go_api_server/interfaces/handler"
 	"github.com/AwataKyosuke/go_api_server/usecase"
+	"github.com/AwataKyosuke/go_api_server/util/config"
+	"github.com/AwataKyosuke/go_api_server/util/logger"
 	"github.com/ant0ine/go-json-rest/rest"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/pkg/errors"
 )
 
 func main() {
 
-	// Dependency Injection[user]
+	// 依存性の注入
 	userPersistence := persistence.NewUserPersistence()
 	userUseCase := usecase.NewUserUseCase(userPersistence)
 	userHandler := handler.NewUserHandler(userUseCase)
 
-	// Dependency Injection[event]
+	// 依存性の注入
 	eventPersistence := persistence.NewEventPresistence()
 	eventUseCase := usecase.NewEventUseCase(eventPersistence)
 	eventHandler := handler.NewEventHandler(eventUseCase)
+
+	// ログ書き込み設定
+	logger.Setting(config.Config.LogFile)
 
 	// ルーティング設定
 	api := rest.NewApi()
@@ -36,10 +41,10 @@ func main() {
 	)
 
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(errors.WithStack(err))
 	}
 
 	// サーバー起動
 	api.SetApp(router)
-	log.Fatal(http.ListenAndServe(":8888", api.MakeHandler()))
+	http.ListenAndServe(":8888", api.MakeHandler())
 }
