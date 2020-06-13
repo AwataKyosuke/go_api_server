@@ -26,7 +26,7 @@ func NewUserUseCase(r repository.UserRepository) UserUseCase {
 
 // GetAll 全てのユーザーを取得する
 func (u userUseCase) GetAll(db *gorm.DB) ([]*model.User, error) {
-	return u.userRepository.GetAll(db)
+	return u.userRepository.GetUsers(db)
 }
 
 // GetUserByID ユーザーIDに一致するユーザーを返す

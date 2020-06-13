@@ -25,8 +25,6 @@ func (p eventPersistence) GetEvents(parameter repository.EventSearchParameter) (
 
 	ret := []*model.Event{}
 
-	// TODO 複数キーワードの検索に対応したい
-
 	// conpassからイベントを検索
 	events, err := getConpassEvent(parameter)
 	if err != nil {
@@ -85,8 +83,8 @@ func getConpassEvent(parameter repository.EventSearchParameter) ([]*model.Event,
 	conpassURL := "https://connpass.com/api/v1/event/?"
 
 	// 開始日と終了日のパラメータを設定
-	start, _ := time.Parse("20060102", parameter.StartDate)
-	end, _ := time.Parse("20060102", parameter.EndDate)
+	start, _ := time.Parse("20060102", parameter.Start)
+	end, _ := time.Parse("20060102", parameter.End)
 	for j := 0; j < int(end.Sub(start).Hours()/24); j++ {
 		conpassURL += "ymd="
 		conpassURL += start.AddDate(0, 0, j).Format("20060102")
@@ -95,10 +93,13 @@ func getConpassEvent(parameter repository.EventSearchParameter) ([]*model.Event,
 
 	// キーワードのパラメータを設定
 	if len(parameter.Keyword) > 0 {
-		conpassURL += "keyword_or="
+		conpassURL += "keyword="
 		conpassURL += parameter.Keyword
 		conpassURL += "&"
 	}
+
+	// 取得件数を100件に固定
+	conpassURL += "count=100"
 
 	// リクエスト送信
 	resp, err := http.Get(conpassURL)
@@ -174,11 +175,11 @@ func getDoorkeeperEvent(parameter repository.EventSearchParameter) ([]*model.Eve
 
 	// 開始日と終了日のパラメータを設定
 	doorkeeperURL += "since="
-	doorkeeperURL += parameter.StartDate
+	doorkeeperURL += parameter.Start
 	doorkeeperURL += "&"
 
 	doorkeeperURL += "until="
-	doorkeeperURL += parameter.EndDate
+	doorkeeperURL += parameter.End
 	doorkeeperURL += "&"
 
 	// キーワードのパラメータを設定

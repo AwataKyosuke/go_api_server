@@ -12,7 +12,7 @@ import (
 
 // UserHandler Userに関するハンドラーを定義するインターフェース
 type UserHandler interface {
-	GetAllUser(w rest.ResponseWriter, r *rest.Request)
+	GetUsers(w rest.ResponseWriter, r *rest.Request)
 	GetUserByID(w rest.ResponseWriter, r *rest.Request)
 }
 
@@ -29,7 +29,7 @@ func NewUserHandler(u usecase.UserUseCase) UserHandler {
 }
 
 // GetAllUser 全てのユーザーを返す
-func (h userHandler) GetAllUser(w rest.ResponseWriter, r *rest.Request) {
+func (h userHandler) GetUsers(w rest.ResponseWriter, r *rest.Request) {
 
 	// dbとのコネクションを生成
 	db := infrastructure.NewDB()

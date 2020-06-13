@@ -10,7 +10,7 @@ import (
 
 // EventUseCase Eventに関するユースケースを定義するインターフェース
 type EventUseCase interface {
-	GetEventsBySortedForDistance(lat float64, lon float64, start string, end string, keyword string) ([]*model.Event, error)
+	GetEventsBySortedForDistance(parameter repository.EventSearchParameter) ([]*model.Event, error)
 }
 
 // eventUseCase ユースケースが依存するリポジトリ
@@ -26,13 +26,7 @@ func NewEventUseCase(r repository.EventRepository) EventUseCase {
 }
 
 // GetEventsBySortedForDistance 距離が近い順に並び替えてイベントを取得する
-func (u eventUseCase) GetEventsBySortedForDistance(lat float64, lon float64, start string, end string, keyword string) ([]*model.Event, error) {
-
-	parameter := repository.EventSearchParameter{
-		StartDate: start,
-		EndDate:   end,
-		Keyword:   keyword,
-	}
+func (u eventUseCase) GetEventsBySortedForDistance(parameter repository.EventSearchParameter) ([]*model.Event, error) {
 
 	events, err := u.eventRepository.GetEvents(parameter)
 	if err != nil {
@@ -41,11 +35,14 @@ func (u eventUseCase) GetEventsBySortedForDistance(lat float64, lon float64, sta
 
 	// 距離を取得
 	for i := 0; i < len(events); i++ {
-		events[i].Distance = calculate.GetDistance(lat, lon, events[i].Lat, events[i].Lon)
+		events[i].Distance = calculate.GetDistance(parameter.Lat, parameter.Lon, events[i].Lat, events[i].Lon)
 	}
 
 	// 近い順にソート
 	sort.Slice(events, func(i, j int) bool { return events[i].Distance < events[j].Distance })
+
+	// 件数を制限
+	events = events[0:parameter.Count]
 
 	return events, nil
 }

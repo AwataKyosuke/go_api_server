@@ -6,12 +6,15 @@ import (
 
 // EventSearchParameter イベント検索時のパラメータ
 type EventSearchParameter struct {
-	StartDate string
-	EndDate   string
-	Keyword   string
+	Lat     float64
+	Lon     float64
+	Start   string
+	End     string
+	Keyword string
+	Count   int
 }
 
-// EventRepository TODO わかりやすいコメントを書きたい
+// EventRepository 永続化を提供する処理を定義するインターフェース
 type EventRepository interface {
 	GetEvents(parameter EventSearchParameter) ([]*model.Event, error)
 }

@@ -5,8 +5,8 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// UserRepository TODO わかりやすいコメントを書きたい
+// UserRepository 永続化を提供する処理を定義するインターフェース
 type UserRepository interface {
-	GetAll(db *gorm.DB) ([]*model.User, error)
+	GetUsers(db *gorm.DB) ([]*model.User, error)
 	GetUserByID(db *gorm.DB, userID int) (*model.User, error)
 }

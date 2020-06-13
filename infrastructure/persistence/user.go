@@ -15,7 +15,7 @@ func NewUserPersistence() repository.UserRepository {
 }
 
 // GetAll 全てのユーザーを取得する
-func (p userPersistence) GetAll(db *gorm.DB) ([]*model.User, error) {
+func (p userPersistence) GetUsers(db *gorm.DB) ([]*model.User, error) {
 
 	// DBからの検索結果を代入する構造体
 	users := []*model.User{}

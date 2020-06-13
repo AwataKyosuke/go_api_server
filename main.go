@@ -35,7 +35,7 @@ func main() {
 	api.Use(rest.DefaultDevStack...)
 
 	router, err := rest.MakeRouter(
-		rest.Get("/users", userHandler.GetAllUser),
+		rest.Get("/users", userHandler.GetUsers),
 		rest.Get("/users/:id", userHandler.GetUserByID),
 		rest.Get("/events", eventHandler.GetEvents),
 	)

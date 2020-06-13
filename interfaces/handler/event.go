@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/AwataKyosuke/go_api_server/domain/repository"
 	"github.com/AwataKyosuke/go_api_server/interfaces/response"
 	"github.com/AwataKyosuke/go_api_server/usecase"
 	"github.com/AwataKyosuke/go_api_server/util/logger"
@@ -31,9 +32,8 @@ func NewEventHandler(u usecase.EventUseCase) EventHandler {
 // GetEvents イベントを取得する
 func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 
-	// 必須パラメータチェック
-	lat := r.URL.Query().Get("lat")
-	if len(lat) < 1 {
+	// 緯度パラメータ必須チェック
+	if len(r.URL.Query().Get("lat")) < 1 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
 			response.Error{
@@ -43,9 +43,8 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	// 必須パラメータチェック
-	lon := r.URL.Query().Get("lon")
-	if len(lon) < 1 {
+	// 経度パラメータ必須チェック
+	if len(r.URL.Query().Get("lon")) < 1 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
 			response.Error{
@@ -55,9 +54,8 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	// 必須パラメータチェック
-	start := r.URL.Query().Get("start")
-	if len(start) < 1 {
+	// 開始日パラメータ必須チェック
+	if len(r.URL.Query().Get("start")) < 1 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
 			response.Error{
@@ -67,9 +65,8 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	// 必須パラメータチェック
-	end := r.URL.Query().Get("end")
-	if len(end) < 1 {
+	// 終了日パラメータ必須チェック
+	if len(r.URL.Query().Get("end")) < 1 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
 			response.Error{
@@ -79,8 +76,19 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	// パラメータフォーマットチェック
-	convLat, err := strconv.ParseFloat(lat, 64)
+	// 取得件数パラメータ必須チェック
+	if len(r.URL.Query().Get("count")) < 1 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.WriteJson(
+			response.Error{
+				Message: "Count parameter is required.",
+				Code:    400,
+			})
+		return
+	}
+
+	// 緯度パラメータ取得
+	lat, err := strconv.ParseFloat(r.URL.Query().Get("lat"), 64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
@@ -91,8 +99,8 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	// パラメータフォーマットチェック
-	convLon, err := strconv.ParseFloat(lon, 64)
+	// 経度パラメータ取得
+	lon, err := strconv.ParseFloat(r.URL.Query().Get("lon"), 64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
@@ -103,8 +111,8 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	// パラメータフォーマットチェック
-	_, err = time.Parse("20060102", start)
+	// 取得件数パラメータ取得
+	count, err := strconv.Atoi(r.URL.Query().Get("count"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
@@ -115,8 +123,20 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	// パラメータフォーマットチェック
-	_, err = time.Parse("20060102", end)
+	// 開始日パラメータ取得
+	start, err := time.Parse("20060102", r.URL.Query().Get("start"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.WriteJson(
+			response.Error{
+				Message: err.Error(),
+				Code:    400,
+			})
+		return
+	}
+
+	// 終了日パラメータ取得
+	end, err := time.Parse("20060102", r.URL.Query().Get("end"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
@@ -130,8 +150,18 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 	// キーワードパラメータ取得
 	keyword := r.URL.Query().Get("keyword")
 
+	// パラメータを作成
+	parameter := repository.EventSearchParameter{
+		Lat:     lat,
+		Lon:     lon,
+		Start:   start.Format("20060102"),
+		End:     end.Format("20060102"),
+		Keyword: keyword,
+		Count:   count,
+	}
+
 	// 距離順に並び替えてイベントを取得する
-	events, err := h.eventUseCase.GetEventsBySortedForDistance(convLat, convLon, start, end, keyword)
+	events, err := h.eventUseCase.GetEventsBySortedForDistance(parameter)
 	if err != nil {
 		logger.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
