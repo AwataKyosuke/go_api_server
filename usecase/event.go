@@ -35,7 +35,7 @@ func (u eventUseCase) GetEventsBySortedForDistance(parameter repository.EventSea
 
 	// 距離を取得
 	for i := 0; i < len(events); i++ {
-		events[i].Distance = calculate.GetDistance(parameter.Lat, parameter.Lon, events[i].Lat, events[i].Lon)
+		events[i].Distance = calculate.GetDistance(parameter.Lat, parameter.Lon, events[i].Position.Lat, events[i].Position.Lon)
 	}
 
 	// 近い順にソート

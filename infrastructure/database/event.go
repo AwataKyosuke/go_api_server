@@ -137,8 +137,8 @@ func getConpassEvent(parameter repository.EventSearchParameter) ([]*model.Event,
 			Accepted:    tmp.Accepted,
 			Waiting:     tmp.Waiting,
 		}
-		addEvent.Lat, _ = strconv.ParseFloat(tmp.Lat, 64)
-		addEvent.Lon, _ = strconv.ParseFloat(tmp.Lon, 64)
+		addEvent.Position.Lat, _ = strconv.ParseFloat(tmp.Lat, 64)
+		addEvent.Position.Lon, _ = strconv.ParseFloat(tmp.Lon, 64)
 		event = append(event, &addEvent)
 	}
 
@@ -221,11 +221,16 @@ func getDoorkeeperEvent(parameter repository.EventSearchParameter) ([]*model.Eve
 			EndedAt:     tmp.EndsAt,
 			Limit:       tmp.TicketLimit,
 			Address:     tmp.Address,
-			Lat:         tmp.Lat,
-			Lon:         tmp.Long,
-			Place:       tmp.VenueName,
-			Accepted:    tmp.Participants,
-			Waiting:     tmp.Waitlisted,
+			Position: struct {
+				Lat float64 `json:"lat"`
+				Lon float64 `json:"lng"`
+			}{
+				Lat: tmp.Lat,
+				Lon: tmp.Long,
+			},
+			Place:    tmp.VenueName,
+			Accepted: tmp.Participants,
+			Waiting:  tmp.Waitlisted,
 		}
 		event = append(event, &addEvent)
 	}

@@ -13,9 +13,11 @@ type Event struct {
 	Limit       int       `json:"limit"`
 	Address     string    `json:"address"`
 	Place       string    `json:"place"`
-	Lat         float64   `json:"lat"`
-	Lon         float64   `json:"lon"`
-	Distance    float64   `json:"distance"`
-	Accepted    int       `json:"accepted"`
-	Waiting     int       `json:"waiting"`
+	Position    struct {
+		Lat float64 `json:"lat"`
+		Lon float64 `json:"lng"`
+	} `json:"position"`
+	Distance float64 `json:"distance"`
+	Accepted int     `json:"accepted"`
+	Waiting  int     `json:"waiting"`
 }
