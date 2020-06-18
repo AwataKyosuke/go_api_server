@@ -1,4 +1,4 @@
-package persistence
+package database
 
 import (
 	"encoding/json"
@@ -13,15 +13,15 @@ import (
 	"github.com/AwataKyosuke/go_api_server/domain/repository"
 )
 
-type eventPersistence struct{}
+type eventRepository struct{}
 
-// NewEventPresistence 依存性を注入しPresistenceを返す
-func NewEventPresistence() repository.EventRepository {
-	return &eventPersistence{}
+// NewEventRepository 依存性を注入しPresistenceを返す
+func NewEventRepository() repository.IEventRepository {
+	return &eventRepository{}
 }
 
 // GetEvents イベント情報を取得する
-func (p eventPersistence) GetEvents(parameter repository.EventSearchParameter) ([]*model.Event, error) {
+func (u eventRepository) GetEvents(parameter repository.EventSearchParameter) ([]*model.Event, error) {
 
 	ret := []*model.Event{}
 

@@ -4,14 +4,12 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/AwataKyosuke/go_api_server/infrastructure"
-	"github.com/AwataKyosuke/go_api_server/interfaces/response"
 	"github.com/AwataKyosuke/go_api_server/usecase"
 	"github.com/ant0ine/go-json-rest/rest"
 )
 
-// UserHandler Userに関するハンドラーを定義するインターフェース
-type UserHandler interface {
+// IUserHandler Userに関するハンドラーを定義するインターフェース
+type IUserHandler interface {
 	GetUsers(w rest.ResponseWriter, r *rest.Request)
 	GetUserByID(w rest.ResponseWriter, r *rest.Request)
 }
@@ -22,7 +20,7 @@ type userHandler struct {
 }
 
 // NewUserHandler 依存性を注入しハンドラーを作成
-func NewUserHandler(u usecase.UserUseCase) UserHandler {
+func NewUserHandler(u usecase.UserUseCase) IUserHandler {
 	return &userHandler{
 		userUseCase: u,
 	}
@@ -31,25 +29,12 @@ func NewUserHandler(u usecase.UserUseCase) UserHandler {
 // GetAllUser 全てのユーザーを返す
 func (h userHandler) GetUsers(w rest.ResponseWriter, r *rest.Request) {
 
-	// dbとのコネクションを生成
-	db := infrastructure.NewDB()
-	connection, err := infrastructure.Connect(db)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.WriteJson(
-			response.Error{
-				Message: err.Error(),
-				Code:    http.StatusInternalServerError,
-			})
-		return
-	}
-
 	// 全てのユーザーを取得
-	users, err := h.userUseCase.GetAll(connection)
+	users, err := h.userUseCase.GetAll()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: err.Error(),
 				Code:    http.StatusInternalServerError,
 			})
@@ -68,30 +53,18 @@ func (h userHandler) GetUserByID(w rest.ResponseWriter, r *rest.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: err.Error(),
 				Code:    http.StatusBadRequest,
 			})
 		return
 	}
 
-	db := infrastructure.NewDB()
-	connection, err := infrastructure.Connect(db)
+	user, err := h.userUseCase.GetUserByID(userID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.WriteJson(
-			response.Error{
-				Message: err.Error(),
-				Code:    http.StatusInternalServerError,
-			})
-		return
-	}
-
-	user, err := h.userUseCase.GetUserByID(connection, userID)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.WriteJson(
-			response.Error{
+			Error{
 				Message: err.Error(),
 				Code:    http.StatusInternalServerError,
 			})

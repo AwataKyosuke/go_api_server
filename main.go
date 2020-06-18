@@ -5,8 +5,8 @@ package main
 import (
 	"net/http"
 
-	"github.com/AwataKyosuke/go_api_server/infrastructure/persistence"
-	"github.com/AwataKyosuke/go_api_server/interfaces/handler"
+	"github.com/AwataKyosuke/go_api_server/infrastructure/database"
+	"github.com/AwataKyosuke/go_api_server/interfaces/api/handler"
 	"github.com/AwataKyosuke/go_api_server/usecase"
 	"github.com/AwataKyosuke/go_api_server/util/config"
 	"github.com/AwataKyosuke/go_api_server/util/logger"
@@ -18,13 +18,13 @@ import (
 func main() {
 
 	// 依存性の注入
-	userPersistence := persistence.NewUserPersistence()
-	userUseCase := usecase.NewUserUseCase(userPersistence)
+	userRepository := database.NewUserRepository()
+	userUseCase := usecase.NewUserUseCase(userRepository)
 	userHandler := handler.NewUserHandler(userUseCase)
 
 	// 依存性の注入
-	eventPersistence := persistence.NewEventPresistence()
-	eventUseCase := usecase.NewEventUseCase(eventPersistence)
+	eventRepository := database.NewEventRepository()
+	eventUseCase := usecase.NewEventUseCase(eventRepository)
 	eventHandler := handler.NewEventHandler(eventUseCase)
 
 	// ログ書き込み設定

@@ -5,6 +5,7 @@ import (
 )
 
 // EventSearchParameter イベント検索時のパラメータ
+// TODO こいつをどこに定義するべきなのか分からない
 type EventSearchParameter struct {
 	Lat     float64
 	Lon     float64
@@ -14,7 +15,7 @@ type EventSearchParameter struct {
 	Count   int
 }
 
-// EventRepository 永続化を提供する処理を定義するインターフェース
-type EventRepository interface {
+// IEventRepository 永続化を提供する処理を定義するインターフェース
+type IEventRepository interface {
 	GetEvents(parameter EventSearchParameter) ([]*model.Event, error)
 }

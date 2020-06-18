@@ -15,11 +15,11 @@ type EventUseCase interface {
 
 // eventUseCase ユースケースが依存するリポジトリ
 type eventUseCase struct {
-	eventRepository repository.EventRepository
+	eventRepository repository.IEventRepository
 }
 
 // NewEventUseCase 依存性を注入
-func NewEventUseCase(r repository.EventRepository) EventUseCase {
+func NewEventUseCase(r repository.IEventRepository) EventUseCase {
 	return &eventUseCase{
 		eventRepository: r,
 	}

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/AwataKyosuke/go_api_server/domain/repository"
-	"github.com/AwataKyosuke/go_api_server/interfaces/response"
 	"github.com/AwataKyosuke/go_api_server/usecase"
 	"github.com/AwataKyosuke/go_api_server/util/logger"
 	"github.com/ant0ine/go-json-rest/rest"
@@ -36,7 +35,7 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 	if len(r.URL.Query().Get("lat")) < 1 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: "Latitude parameter is required.",
 				Code:    400,
 			})
@@ -47,7 +46,7 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 	if len(r.URL.Query().Get("lon")) < 1 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: "Longitude parameter is required.",
 				Code:    400,
 			})
@@ -58,7 +57,7 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 	if len(r.URL.Query().Get("start")) < 1 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: "Start parameter is required.",
 				Code:    400,
 			})
@@ -69,7 +68,7 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 	if len(r.URL.Query().Get("end")) < 1 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: "End parameter is required.",
 				Code:    400,
 			})
@@ -80,7 +79,7 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 	if len(r.URL.Query().Get("count")) < 1 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: "Count parameter is required.",
 				Code:    400,
 			})
@@ -92,7 +91,7 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: err.Error(),
 				Code:    400,
 			})
@@ -104,7 +103,7 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: err.Error(),
 				Code:    400,
 			})
@@ -116,7 +115,7 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: err.Error(),
 				Code:    400,
 			})
@@ -128,7 +127,7 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: err.Error(),
 				Code:    400,
 			})
@@ -140,7 +139,7 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: err.Error(),
 				Code:    400,
 			})
@@ -166,7 +165,7 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 		logger.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.WriteJson(
-			response.Error{
+			Error{
 				Message: err.Error(),
 				Code:    500,
 			})
