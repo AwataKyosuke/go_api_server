@@ -11,6 +11,7 @@ import (
 
 	"github.com/AwataKyosuke/go_api_server/domain/model"
 	"github.com/AwataKyosuke/go_api_server/domain/repository"
+	"github.com/AwataKyosuke/go_api_server/util/formatter"
 )
 
 type eventRepository struct{}
@@ -129,8 +130,8 @@ func getConpassEvent(parameter repository.EventSearchParameter) ([]*model.Event,
 			Title:       tmp.Title,
 			Description: tmp.Description,
 			EventURL:    tmp.EventURL,
-			StartedAt:   tmp.StartedAt,
-			EndedAt:     tmp.EndedAt,
+			StartedAt:   formatter.Format(tmp.StartedAt),
+			EndedAt:     formatter.Format(tmp.EndedAt),
 			Limit:       tmp.Limit,
 			Address:     tmp.Address,
 			Place:       tmp.Place,
@@ -217,8 +218,8 @@ func getDoorkeeperEvent(parameter repository.EventSearchParameter) ([]*model.Eve
 			Title:       tmp.Title,
 			Description: tmp.Description,
 			EventURL:    tmp.PublicURL,
-			StartedAt:   tmp.StartsAt,
-			EndedAt:     tmp.EndsAt,
+			StartedAt:   formatter.Format(tmp.StartsAt),
+			EndedAt:     formatter.Format(tmp.EndsAt),
 			Limit:       tmp.TicketLimit,
 			Address:     tmp.Address,
 			Position: struct {
