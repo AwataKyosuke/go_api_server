@@ -42,7 +42,9 @@ func (u eventUseCase) GetEventsBySortedForDistance(parameter repository.EventSea
 	sort.Slice(events, func(i, j int) bool { return events[i].Distance < events[j].Distance })
 
 	// 件数を制限
-	events = events[0:parameter.Count]
+	if len(events) > parameter.Count {
+		events = events[0:parameter.Count]
+	}
 
 	return events, nil
 }
