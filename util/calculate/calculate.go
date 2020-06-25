@@ -24,5 +24,5 @@ func GetDistance(lat1 float64, lng1 float64, lat2 float64, lng2 float64) float64
 
 	earthRadius := 6378140.
 	distance := earthRadius * rr
-	return distance
+	return math.Round(distance) / 1000
 }
