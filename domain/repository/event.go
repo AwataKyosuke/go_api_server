@@ -13,6 +13,8 @@ type EventSearchParameter struct {
 	End     string
 	Keyword string
 	Count   int
+	Online  bool
+	Offline bool
 }
 
 // IEventRepository 永続化を提供する処理を定義するインターフェース

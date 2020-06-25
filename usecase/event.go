@@ -5,6 +5,7 @@ import (
 
 	"github.com/AwataKyosuke/go_api_server/domain/model"
 	"github.com/AwataKyosuke/go_api_server/domain/repository"
+	"github.com/AwataKyosuke/go_api_server/domain/service"
 	"github.com/AwataKyosuke/go_api_server/util/calculate"
 )
 
@@ -33,9 +34,12 @@ func (u eventUseCase) GetEventsBySortedForDistance(parameter repository.EventSea
 		return nil, err
 	}
 
+	// 開催方法による絞り込み
+	events = service.Filtered(events, parameter.Online, parameter.Offline)
+
 	// 距離を取得
-	for i := 0; i < len(events); i++ {
-		events[i].Distance = calculate.GetDistance(parameter.Lat, parameter.Lon, events[i].Position.Lat, events[i].Position.Lon)
+	for _, event := range events {
+		event.Distance = calculate.GetDistance(parameter.Lat, parameter.Lon, event.Position.Lat, event.Position.Lon)
 	}
 
 	// 近い順にソート

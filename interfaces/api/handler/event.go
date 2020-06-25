@@ -146,6 +146,28 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
+	// 開催方法がオンラインのデータのみを対象とするパラメータ
+	online, err := strconv.ParseBool(r.URL.Query().Get("online"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.WriteJson(
+			Error{
+				Message: err.Error(),
+				Code:    400,
+			})
+	}
+
+	// 開催方法がオフラインのデータのみを対象とするパラメータ
+	offline, err := strconv.ParseBool(r.URL.Query().Get("offline"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.WriteJson(
+			Error{
+				Message: err.Error(),
+				Code:    400,
+			})
+	}
+
 	// キーワードパラメータ取得
 	keyword := r.URL.Query().Get("keyword")
 
@@ -157,6 +179,8 @@ func (h eventHandler) GetEvents(w rest.ResponseWriter, r *rest.Request) {
 		End:     end.Format("20060102"),
 		Keyword: keyword,
 		Count:   count,
+		Online:  online,
+		Offline: offline,
 	}
 
 	// 距離順に並び替えてイベントを取得する
