@@ -12,3 +12,4 @@ RUN go get github.com/jinzhu/gorm
 RUN go get github.com/pkg/errors
 RUN go get gopkg.in/ini.v1
 RUN go get github.com/derekparker/delve/cmd/dlv
+RUN go get github.com/PuerkitoBio/goquery
