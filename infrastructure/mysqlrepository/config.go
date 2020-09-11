@@ -1,4 +1,4 @@
-package database
+package mysqlrepository
 
 import (
 	"github.com/AwataKyosuke/go_api_server/util/config"

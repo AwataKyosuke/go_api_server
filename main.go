@@ -5,8 +5,8 @@ package main
 import (
 	"net/http"
 
-	"github.com/AwataKyosuke/go_api_server/infrastructure/database"
-	"github.com/AwataKyosuke/go_api_server/interfaces/api/handler"
+	"github.com/AwataKyosuke/go_api_server/infrastructure/mysqlrepository"
+	"github.com/AwataKyosuke/go_api_server/interfaces/handler"
 	"github.com/AwataKyosuke/go_api_server/usecase"
 	"github.com/AwataKyosuke/go_api_server/util/config"
 	"github.com/AwataKyosuke/go_api_server/util/logger"
@@ -18,14 +18,9 @@ import (
 func main() {
 
 	// 依存性の注入
-	userRepository := database.NewUserRepository()
+	userRepository := mysqlrepository.NewUserRepository()
 	userUseCase := usecase.NewUserUseCase(userRepository)
 	userHandler := handler.NewUserHandler(userUseCase)
-
-	// 依存性の注入
-	eventRepository := database.NewEventRepository()
-	eventUseCase := usecase.NewEventUseCase(eventRepository)
-	eventHandler := handler.NewEventHandler(eventUseCase)
 
 	// ログ書き込み設定
 	logger.Setting(config.Config.LogFile)
@@ -37,7 +32,6 @@ func main() {
 	router, err := rest.MakeRouter(
 		rest.Get("/users", userHandler.GetUsers),
 		rest.Get("/users/:id", userHandler.GetUserByID),
-		rest.Get("/events", eventHandler.GetEvents),
 	)
 
 	if err != nil {

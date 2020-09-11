@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/AwataKyosuke/go_api_server/interfaces/respond"
 	"github.com/AwataKyosuke/go_api_server/usecase"
 	"github.com/ant0ine/go-json-rest/rest"
 )
@@ -32,12 +33,7 @@ func (h userHandler) GetUsers(w rest.ResponseWriter, r *rest.Request) {
 	// 全てのユーザーを取得
 	users, err := h.userUseCase.GetAll()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.WriteJson(
-			Error{
-				Message: err.Error(),
-				Code:    http.StatusInternalServerError,
-			})
+		respond.InternalServerError(w, err.Error())
 		return
 	}
 
@@ -51,23 +47,13 @@ func (h userHandler) GetUserByID(w rest.ResponseWriter, r *rest.Request) {
 
 	userID, err := strconv.Atoi(r.PathParam("id"))
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.WriteJson(
-			Error{
-				Message: err.Error(),
-				Code:    http.StatusBadRequest,
-			})
+		respond.BadRequest(w, err.Error())
 		return
 	}
 
 	user, err := h.userUseCase.GetUserByID(userID)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.WriteJson(
-			Error{
-				Message: err.Error(),
-				Code:    http.StatusInternalServerError,
-			})
+		respond.InternalServerError(w, err.Error())
 		return
 	}
 
