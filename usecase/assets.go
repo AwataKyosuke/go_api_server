@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"github.com/AwataKyosuke/go_api_server/domain/model"
 	"github.com/AwataKyosuke/go_api_server/domain/repository"
 	"github.com/AwataKyosuke/go_api_server/domain/service"
 )
@@ -8,6 +9,7 @@ import (
 // IAssetsUseCase 必要なユースケースを定義するインターフェース
 type IAssetsUseCase interface {
 	Import(session string) error
+	GetAll() ([]*model.Assets, error)
 }
 
 type assetsUseCase struct {
@@ -33,4 +35,12 @@ func (u *assetsUseCase) Import(session string) error {
 		return err
 	}
 	return nil
+}
+
+func (u *assetsUseCase) GetAll() ([]*model.Assets, error) {
+	assets, err := u.repository.All()
+	if err != nil {
+		return nil, err
+	}
+	return assets, nil
 }

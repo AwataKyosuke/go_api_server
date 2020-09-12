@@ -38,6 +38,8 @@ func main() {
 	router, err := rest.MakeRouter(
 		rest.Get("/users", withCORS(userHandler.GetUsers)),
 		rest.Get("/users/:id", withCORS(userHandler.GetUserByID)),
+
+		rest.Get("/assets", withCORS(assetsHandler.GetAll)),
 		rest.Post("/assets", withCORS(assetsHandler.Import)),
 	)
 

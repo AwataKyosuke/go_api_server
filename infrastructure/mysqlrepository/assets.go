@@ -28,7 +28,7 @@ type assets struct {
 	UpdatedUser string
 }
 
-func (a *assetsRepository) Insert(data []model.Assets) error {
+func (a *assetsRepository) Insert(data []*model.Assets) error {
 	con, err := GetConnection()
 	defer con.Close()
 
@@ -52,6 +52,29 @@ func (a *assetsRepository) Insert(data []model.Assets) error {
 	return nil
 }
 
-func (a *assetsRepository) All() ([]model.Assets, error) {
-	return nil, nil
+func (a *assetsRepository) All() ([]*model.Assets, error) {
+
+	// dbとのコネクションを生成
+	con, err := GetConnection()
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	// DBからの検索結果を代入する構造体
+	assets := []*assets{}
+
+	// 検索実行
+	con.Find(&assets)
+
+	ret := []*model.Assets{}
+
+	for _, a := range assets {
+		r := &model.Assets{}
+		r.SetName(a.Name)
+		r.SetAmount(a.Amount)
+		r.SetBank(a.Bank)
+		ret = append(ret, r)
+	}
+
+	return ret, nil
 }

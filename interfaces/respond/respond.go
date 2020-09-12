@@ -11,9 +11,9 @@ type errorResponse struct {
 	Code    int
 }
 
-func Success(w rest.ResponseWriter, json interface{}) {
+func Success(w rest.ResponseWriter, ret interface{}) {
 	w.WriteHeader(http.StatusOK)
-	w.WriteJson(json)
+	w.WriteJson(&ret)
 }
 
 func InternalServerError(w rest.ResponseWriter, message string) {

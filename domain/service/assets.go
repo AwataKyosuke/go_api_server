@@ -14,7 +14,7 @@ import (
 
 // IAssetsService 必要なサービスを定義するインターフェース
 type IAssetsService interface {
-	Search(session string) ([]model.Assets, error)
+	Search(session string) ([]*model.Assets, error)
 }
 
 type assetsService struct{}
@@ -24,7 +24,7 @@ func NewAssetsService() IAssetsService {
 	return &assetsService{}
 }
 
-func (s *assetsService) Search(session string) ([]model.Assets, error) {
+func (s *assetsService) Search(session string) ([]*model.Assets, error) {
 	// 接続先の指定
 	req, err := http.NewRequest("GET", "https://moneyforward.com/bs/portfolio", nil)
 
@@ -59,7 +59,7 @@ func (s *assetsService) Search(session string) ([]model.Assets, error) {
 	// 	return nil, err
 	// }
 
-	assets := []model.Assets{}
+	assets := []*model.Assets{}
 
 	// テーブルの各行を取得
 	table := doc.Find("table.table-bordered")
@@ -121,7 +121,7 @@ func (s *assetsService) Search(session string) ([]model.Assets, error) {
 
 		// assetが有効なら追加する
 		if asset.IsValid() {
-			assets = append(assets, *asset)
+			assets = append(assets, asset)
 		}
 
 	})
