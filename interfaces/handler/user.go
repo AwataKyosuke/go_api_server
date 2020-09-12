@@ -17,11 +17,11 @@ type IUserHandler interface {
 
 // userHandler 依存しているユースケースを返す
 type userHandler struct {
-	userUseCase usecase.UserUseCase
+	userUseCase usecase.IUserUseCase
 }
 
 // NewUserHandler 依存性を注入しハンドラーを作成
-func NewUserHandler(u usecase.UserUseCase) IUserHandler {
+func NewUserHandler(u usecase.IUserUseCase) IUserHandler {
 	return &userHandler{
 		userUseCase: u,
 	}

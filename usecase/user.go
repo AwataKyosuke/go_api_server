@@ -5,7 +5,8 @@ import (
 	"github.com/AwataKyosuke/go_api_server/domain/repository"
 )
 
-type UserUseCase interface {
+// UserUseCase ユースケースを定義するインターフェース
+type IUserUseCase interface {
 	GetAll() ([]*model.User, error)
 	GetUserByID(userID int) (*model.User, error)
 }
@@ -16,7 +17,7 @@ type userUseCase struct {
 }
 
 // NewUserUseCase 依存性を注入しユースケースを返す
-func NewUserUseCase(r repository.IUserRepository) UserUseCase {
+func NewUserUseCase(r repository.IUserRepository) IUserUseCase {
 	return &userUseCase{
 		userRepository: r,
 	}

@@ -29,7 +29,7 @@ func main() {
 	assetsHandler := handler.NewAssetsHandler(assetsUseCase)
 
 	// ログ書き込み設定
-	logger.Setting(config.Config.LogFile)
+	logger.Setting(config.Values.LogFile)
 
 	// ルーティング設定
 	api := rest.NewApi()

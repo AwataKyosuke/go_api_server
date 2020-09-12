@@ -11,11 +11,13 @@ type errorResponse struct {
 	Code    int
 }
 
+// Success ステータスコード200としてレスポンスを返す。
 func Success(w rest.ResponseWriter, ret interface{}) {
 	w.WriteHeader(http.StatusOK)
 	w.WriteJson(&ret)
 }
 
+// InternalServerError ステータスコード500としてレスポンスを返す。
 func InternalServerError(w rest.ResponseWriter, message string) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.WriteJson(&errorResponse{
@@ -24,6 +26,7 @@ func InternalServerError(w rest.ResponseWriter, message string) {
 	})
 }
 
+// BadRequest ステータスコード400としてレスポンスを返す。
 func BadRequest(w rest.ResponseWriter, message string) {
 	w.WriteHeader(http.StatusBadRequest)
 	w.WriteJson(&errorResponse{

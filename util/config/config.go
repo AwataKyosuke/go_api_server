@@ -6,8 +6,8 @@ import (
 	"gopkg.in/ini.v1"
 )
 
-// ConfigList 設定ファイルから取得したデータを保持する構造体
-type ConfigList struct {
+// MyConfig 設定ファイルから取得したデータを保持する構造体
+type MyConfig struct {
 	LogFile  string
 	Host     string
 	UserName string
@@ -15,8 +15,8 @@ type ConfigList struct {
 	DBName   string
 }
 
-// Config 設定リスト保持変数
-var Config ConfigList
+// Values 設定リスト保持変数
+var Values MyConfig
 
 // コンストラクタ
 func init() {
@@ -27,7 +27,7 @@ func init() {
 	}
 
 	// 変数に設定
-	Config = ConfigList{
+	Values = MyConfig{
 		LogFile:  cfg.Section("go_api_server").Key("log_file").String(),
 		Host:     cfg.Section("db_setting").Key("host").String(),
 		UserName: cfg.Section("db_setting").Key("user_name").String(),
