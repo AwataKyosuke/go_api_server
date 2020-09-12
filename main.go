@@ -30,8 +30,8 @@ func main() {
 	api.Use(rest.DefaultDevStack...)
 
 	router, err := rest.MakeRouter(
-		rest.Get("/users", userHandler.GetUsers),
-		rest.Get("/users/:id", userHandler.GetUserByID),
+		rest.Get("/users", withCORS(userHandler.GetUsers)),
+		rest.Get("/users/:id", withCORS(userHandler.GetUserByID)),
 	)
 
 	if err != nil {
@@ -41,4 +41,13 @@ func main() {
 	// サーバー起動
 	api.SetApp(router)
 	http.ListenAndServe(":8888", api.MakeHandler())
+}
+
+// withCORS CORSを有効にする
+func withCORS(f rest.HandlerFunc) rest.HandlerFunc {
+	return func(w rest.ResponseWriter, r *rest.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Expose-Headers", "Location")
+		f(w, r)
+	}
 }
