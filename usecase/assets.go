@@ -1,8 +1,6 @@
 package usecase
 
 import (
-	"log"
-
 	"github.com/AwataKyosuke/go_api_server/domain/repository"
 	"github.com/AwataKyosuke/go_api_server/domain/service"
 )
@@ -17,8 +15,8 @@ type assetsUseCase struct {
 	service    service.IAssetsService
 }
 
-// NewUseCase ユースケースのコンストラクタ
-func NewUseCase(repository repository.IAssetsRepository, service service.IAssetsService) IAssetsUseCase {
+// NewAssetsUseCase ユースケースのコンストラクタ
+func NewAssetsUseCase(repository repository.IAssetsRepository, service service.IAssetsService) IAssetsUseCase {
 	return &assetsUseCase{
 		repository: repository,
 		service:    service,
@@ -30,8 +28,6 @@ func (u *assetsUseCase) Import(session string) error {
 	if err != nil {
 		return err
 	}
-	// TODO
-	log.Println(assets)
 	err = u.repository.Insert(assets)
 	if err != nil {
 		return err

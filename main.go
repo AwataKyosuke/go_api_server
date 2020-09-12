@@ -5,6 +5,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/AwataKyosuke/go_api_server/domain/service"
 	"github.com/AwataKyosuke/go_api_server/infrastructure/mysqlrepository"
 	"github.com/AwataKyosuke/go_api_server/interfaces/handler"
 	"github.com/AwataKyosuke/go_api_server/usecase"
@@ -22,6 +23,11 @@ func main() {
 	userUseCase := usecase.NewUserUseCase(userRepository)
 	userHandler := handler.NewUserHandler(userUseCase)
 
+	assetsRepository := mysqlrepository.NewAssetsRepository()
+	assetsService := service.NewAssetsService()
+	assetsUseCase := usecase.NewAssetsUseCase(assetsRepository, assetsService)
+	assetsHandler := handler.NewAssetsHandler(assetsUseCase)
+
 	// ログ書き込み設定
 	logger.Setting(config.Config.LogFile)
 
@@ -32,6 +38,7 @@ func main() {
 	router, err := rest.MakeRouter(
 		rest.Get("/users", withCORS(userHandler.GetUsers)),
 		rest.Get("/users/:id", withCORS(userHandler.GetUserByID)),
+		rest.Post("/assets", withCORS(assetsHandler.Import)),
 	)
 
 	if err != nil {

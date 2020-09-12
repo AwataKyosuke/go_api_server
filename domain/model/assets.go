@@ -1,6 +1,8 @@
 package model
 
-import "github.com/pkg/errors"
+import (
+	"github.com/pkg/errors"
+)
 
 // Assets 資産情報
 type Assets struct {
@@ -13,6 +15,10 @@ func NewAssets() *Assets {
 	return &Assets{}
 }
 
+func (a *Assets) GetName() string {
+	return a.name
+}
+
 func (a *Assets) SetName(value string) error {
 	if len(value) == 0 {
 		return errors.WithStack(errors.New("名称は1文字以上である必要があります。"))
@@ -21,12 +27,20 @@ func (a *Assets) SetName(value string) error {
 	return nil
 }
 
+func (a *Assets) GetAmount() int {
+	return a.amount
+}
+
 func (a *Assets) SetAmount(value int) error {
 	if value < 0 {
 		return errors.WithStack(errors.New("残高は0以上の整数である必要があります。"))
 	}
 	a.amount = value
 	return nil
+}
+
+func (a *Assets) GetBank() string {
+	return a.bank
 }
 
 func (a *Assets) SetBank(value string) error {

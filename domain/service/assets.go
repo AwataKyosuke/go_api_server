@@ -19,8 +19,8 @@ type IAssetsService interface {
 
 type assetsService struct{}
 
-// NewService サービスのコンストラクタ
-func NewService() IAssetsService {
+// NewAssetsService サービスのコンストラクタ
+func NewAssetsService() IAssetsService {
 	return &assetsService{}
 }
 

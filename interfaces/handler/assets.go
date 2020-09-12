@@ -15,8 +15,8 @@ type assetsHandler struct {
 	usecase usecase.IAssetsUseCase
 }
 
-// NewHandler ハンドラーのコンストラクタ
-func NewHandler(usecase usecase.IAssetsUseCase) IAssetsHandler {
+// NewAssetsHandler ハンドラーのコンストラクタ
+func NewAssetsHandler(usecase usecase.IAssetsUseCase) IAssetsHandler {
 	return &assetsHandler{
 		usecase: usecase,
 	}
