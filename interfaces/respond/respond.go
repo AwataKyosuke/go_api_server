@@ -1,36 +1,118 @@
 package respond
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/ant0ine/go-json-rest/rest"
 )
 
+type Responder interface {
+	Success(json interface{})
+	InternalServerError(message string)
+	BadRequest(message string)
+}
+
+type netHTTPReponder struct {
+	writer   http.ResponseWriter
+	response response
+}
+
+type goJSONRestResponder struct {
+	writer   rest.ResponseWriter
+	response response
+}
+
+type response struct {
+	Code int
+	JSON interface{}
+}
+
 type errorResponse struct {
 	Message string
-	Code    int
+}
+
+func NewNetHTTPResponder(w http.ResponseWriter) Responder {
+	return &netHTTPReponder{
+		writer:   w,
+		response: response{},
+	}
+}
+
+func (n *netHTTPReponder) Success(j interface{}) {
+	n.response.Code = http.StatusOK
+	n.response.JSON = j
+	res, err := json.Marshal(n.response)
+	if err != nil {
+		http.Error(n.writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	n.writer.Header().Set("Content-Type", "application/json")
+	n.writer.WriteHeader(http.StatusOK)
+	n.writer.Write(res)
+}
+
+func (n *netHTTPReponder) InternalServerError(message string) {
+	n.response.Code = http.StatusInternalServerError
+	n.response.JSON = errorResponse{
+		Message: message,
+	}
+	res, err := json.Marshal(n.response)
+	if err != nil {
+		http.Error(n.writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	n.writer.Header().Set("Content-Type", "application/json")
+	n.writer.WriteHeader(http.StatusInternalServerError)
+	n.writer.Write(res)
+}
+
+func (n *netHTTPReponder) BadRequest(message string) {
+	n.response.Code = http.StatusBadRequest
+	n.response.JSON = errorResponse{
+		Message: message,
+	}
+	res, err := json.Marshal(n.response)
+	if err != nil {
+		http.Error(n.writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	n.writer.Header().Set("Content-Type", "application/json")
+	n.writer.WriteHeader(http.StatusBadRequest)
+	n.writer.Write(res)
+}
+
+func NewGoJSONRestResponder(w rest.ResponseWriter) Responder {
+	return &goJSONRestResponder{
+		writer:   w,
+		response: response{},
+	}
 }
 
 // Success ステータスコード200としてレスポンスを返す。
-func Success(w rest.ResponseWriter, ret interface{}) {
-	w.WriteHeader(http.StatusOK)
-	w.WriteJson(&ret)
+func (g *goJSONRestResponder) Success(json interface{}) {
+	g.writer.WriteHeader(http.StatusOK)
+	g.response.Code = http.StatusOK
+	g.response.JSON = json
+	g.writer.WriteJson(g.response)
 }
 
 // InternalServerError ステータスコード500としてレスポンスを返す。
-func InternalServerError(w rest.ResponseWriter, message string) {
-	w.WriteHeader(http.StatusInternalServerError)
-	w.WriteJson(&errorResponse{
+func (g *goJSONRestResponder) InternalServerError(message string) {
+	g.writer.WriteHeader(http.StatusInternalServerError)
+	g.response.Code = http.StatusInternalServerError
+	g.response.JSON = errorResponse{
 		Message: message,
-		Code:    http.StatusInternalServerError,
-	})
+	}
+	g.writer.WriteJson(g.response)
 }
 
 // BadRequest ステータスコード400としてレスポンスを返す。
-func BadRequest(w rest.ResponseWriter, message string) {
-	w.WriteHeader(http.StatusBadRequest)
-	w.WriteJson(&errorResponse{
+func (g *goJSONRestResponder) BadRequest(message string) {
+	g.writer.WriteHeader(http.StatusBadRequest)
+	g.response.Code = http.StatusBadRequest
+	g.response.JSON = errorResponse{
 		Message: message,
-		Code:    http.StatusBadRequest,
-	})
+	}
+	g.writer.WriteJson(g.response)
 }

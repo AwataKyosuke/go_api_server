@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"net/http"
 	"strconv"
 
 	"github.com/AwataKyosuke/go_api_server/interfaces/respond"
@@ -30,34 +29,36 @@ func NewUserHandler(u usecase.IUserUseCase) IUserHandler {
 // GetAllUser 全てのユーザーを返す
 func (h userHandler) GetUsers(w rest.ResponseWriter, r *rest.Request) {
 
+	responder := respond.NewGoJSONRestResponder(w)
+
 	// 全てのユーザーを取得
 	users, err := h.userUseCase.GetAll()
 	if err != nil {
-		respond.InternalServerError(w, err.Error())
+		responder.InternalServerError(err.Error())
 		return
 	}
 
 	// 成功
-	w.WriteHeader(http.StatusOK)
-	w.WriteJson(&users)
+	responder.Success(&users)
 }
 
 // GetUserByID ユーザーIDに一致するユーザーを返す
 func (h userHandler) GetUserByID(w rest.ResponseWriter, r *rest.Request) {
 
+	responder := respond.NewGoJSONRestResponder(w)
+
 	userID, err := strconv.Atoi(r.PathParam("id"))
 	if err != nil {
-		respond.BadRequest(w, err.Error())
+		responder.BadRequest(err.Error())
 		return
 	}
 
 	user, err := h.userUseCase.GetUserByID(userID)
 	if err != nil {
-		respond.InternalServerError(w, err.Error())
+		responder.InternalServerError(err.Error())
 		return
 	}
 
 	// 成功
-	w.WriteHeader(http.StatusOK)
-	w.WriteJson(&user)
+	responder.Success(&user)
 }

@@ -32,14 +32,17 @@ type assetsToJSON struct {
 }
 
 func (h *assetsHandler) Import(w rest.ResponseWriter, r *rest.Request) {
+
+	responder := respond.NewGoJSONRestResponder(w)
+
 	session := r.Header.Get("session")
 	if len(session) == 0 {
-		respond.BadRequest(w, "マネーフォワードにアクセスするために必要なセッション情報が入力されていません")
+		responder.BadRequest("マネーフォワードにアクセスするために必要なセッション情報が入力されていません")
 		return
 	}
 	err := h.usecase.Import(session)
 	if err != nil {
-		respond.InternalServerError(w, err.Error())
+		responder.InternalServerError(err.Error())
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -47,9 +50,12 @@ func (h *assetsHandler) Import(w rest.ResponseWriter, r *rest.Request) {
 }
 
 func (h *assetsHandler) GetAll(w rest.ResponseWriter, r *rest.Request) {
+
+	responder := respond.NewGoJSONRestResponder(w)
+
 	assets, err := h.usecase.GetAll()
 	if err != nil {
-		respond.InternalServerError(w, err.Error())
+		responder.InternalServerError(err.Error())
 		return
 	}
 	ret := []*assetsToJSON{}
@@ -61,5 +67,5 @@ func (h *assetsHandler) GetAll(w rest.ResponseWriter, r *rest.Request) {
 		}
 		ret = append(ret, &r)
 	}
-	respond.Success(w, ret)
+	responder.Success(ret)
 }

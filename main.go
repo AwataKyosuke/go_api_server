@@ -28,33 +28,52 @@ func main() {
 	assetsUseCase := usecase.NewAssetsUseCase(assetsRepository, assetsService)
 	assetsHandler := handler.NewAssetsHandler(assetsUseCase)
 
+	historyRepository := mysqlrepository.NewHistoryRepository()
+	historyService := service.NewHistoryService()
+	historyUseCase := usecase.NewHistoryUseCase(historyRepository, historyService)
+	historyHandler := handler.NewHistoryHandler(historyUseCase)
+
 	// ログ書き込み設定
 	logger.Setting(config.Values.LogFile)
 
 	// ルーティング設定
 	api := rest.NewApi()
 	api.Use(rest.DefaultDevStack...)
-
+	api.Use(&rest.CorsMiddleware{
+		RejectNonCorsRequests: false,
+		OriginValidator: func(origin string, request *rest.Request) bool {
+			return origin == "http://localhost:8080"
+		},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders: []string{
+			"Accept", "Content-Type", "X-Custom-Header", "Origin"},
+		AccessControlAllowCredentials: true,
+		AccessControlMaxAge:           3600,
+	})
 	router, err := rest.MakeRouter(
-		rest.Get("/users", withCORS(userHandler.GetUsers)),
-		rest.Get("/users/:id", withCORS(userHandler.GetUserByID)),
+		rest.Get("/users", userHandler.GetUsers),
+		rest.Get("/users/:id", userHandler.GetUserByID),
 
-		rest.Get("/assets", withCORS(assetsHandler.GetAll)),
-		rest.Post("/assets", withCORS(assetsHandler.Import)),
+		rest.Get("/assets", assetsHandler.GetAll),
+		rest.Post("/assets", assetsHandler.Import),
+
+		rest.Get("/histories", historyHandler.GetAll),
 	)
 
 	if err != nil {
 		logger.Fatal(errors.WithStack(err))
 	}
 
-	// サーバー起動
 	api.SetApp(router)
-	http.ListenAndServe(":8888", api.MakeHandler())
+	http.Handle("/api/", http.StripPrefix("/api", api.MakeHandler()))
+	http.Handle("/upload/history", withCORS(historyHandler.Import))
+
+	http.ListenAndServe(":8888", nil)
 }
 
 // withCORS CORSを有効にする
-func withCORS(f rest.HandlerFunc) rest.HandlerFunc {
-	return func(w rest.ResponseWriter, r *rest.Request) {
+func withCORS(f http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Expose-Headers", "Location")
 		f(w, r)
