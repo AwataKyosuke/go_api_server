@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"mime/multipart"
+
 	"github.com/AwataKyosuke/go_api_server/domain/model"
 	"github.com/AwataKyosuke/go_api_server/domain/repository"
 	"github.com/AwataKyosuke/go_api_server/domain/service"
@@ -8,7 +10,7 @@ import (
 
 // IAssetsUseCase 必要なユースケースを定義するインターフェース
 type IAssetsUseCase interface {
-	Import(session string) error
+	Import(multipart.File) error
 	GetAll() ([]*model.Assets, error)
 }
 
@@ -25,8 +27,8 @@ func NewAssetsUseCase(repository repository.IAssetsRepository, service service.I
 	}
 }
 
-func (u *assetsUseCase) Import(session string) error {
-	assets, err := u.service.Search(session)
+func (u *assetsUseCase) Import(file multipart.File) error {
+	assets, err := u.service.SearchFromHtml(file)
 	if err != nil {
 		return err
 	}

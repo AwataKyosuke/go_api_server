@@ -1,9 +1,8 @@
 package service
 
 import (
-	"fmt"
 	"log"
-	"net/http"
+	"mime/multipart"
 	"strconv"
 	"strings"
 
@@ -14,7 +13,7 @@ import (
 
 // IAssetsService 必要なサービスを定義するインターフェース
 type IAssetsService interface {
-	Search(session string) ([]*model.Assets, error)
+	SearchFromHtml(multipart.File) ([]*model.Assets, error)
 }
 
 type assetsService struct{}
@@ -24,40 +23,13 @@ func NewAssetsService() IAssetsService {
 	return &assetsService{}
 }
 
-func (s *assetsService) Search(session string) ([]*model.Assets, error) {
-	// 接続先の指定
-	req, err := http.NewRequest("GET", "https://moneyforward.com/bs/portfolio", nil)
-
-	// リクエストヘッダーにCookie情報の書き込み（セッション情報だけで良さそうなのでこれだけ）
-	req.AddCookie(&http.Cookie{Name: "_moneybook_session", Value: session})
-
-	// 問い合わせ実行
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	defer res.Body.Close()
-	if res.StatusCode != 200 {
-		return nil, errors.WithStack(errors.New(fmt.Sprintf("status code error: %d %s", res.StatusCode, res.Status)))
-	}
+func (s *assetsService) SearchFromHtml(file multipart.File) ([]*model.Assets, error) {
 
 	// HTMLドキュメントの読み込み
-	doc, err := goquery.NewDocumentFromReader(res.Body)
+	doc, err := goquery.NewDocumentFromReader(file)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-
-	// ローカルにHTMLファイルを保存
-	// buf := new(bytes.Buffer)
-	// _, err = io.Copy(buf, res.Body)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// err = ioutil.WriteFile("./sample.html", buf.Bytes(), os.ModePerm)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	assets := []*model.Assets{}
 

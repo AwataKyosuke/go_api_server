@@ -55,7 +55,6 @@ func main() {
 		rest.Get("/users/:id", userHandler.GetUserByID),
 
 		rest.Get("/assets", assetsHandler.GetAll),
-		rest.Post("/assets", assetsHandler.Import),
 
 		rest.Get("/histories", historyHandler.GetAll),
 	)
@@ -67,6 +66,7 @@ func main() {
 	api.SetApp(router)
 	http.Handle("/api/", http.StripPrefix("/api", api.MakeHandler()))
 	http.Handle("/upload/history", withCORS(historyHandler.Import))
+	http.Handle("/upload/asset", withCORS(assetsHandler.Import))
 
 	http.ListenAndServe(":8888", nil)
 }

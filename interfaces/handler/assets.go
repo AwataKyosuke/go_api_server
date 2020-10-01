@@ -10,7 +10,7 @@ import (
 
 // IAssetsHandler 必要なハンドラーを定義するインターフェース
 type IAssetsHandler interface {
-	Import(rest.ResponseWriter, *rest.Request)
+	Import(http.ResponseWriter, *http.Request)
 	GetAll(rest.ResponseWriter, *rest.Request)
 }
 
@@ -31,22 +31,24 @@ type assetsToJSON struct {
 	Bank   string `json:"bank"`
 }
 
-func (h *assetsHandler) Import(w rest.ResponseWriter, r *rest.Request) {
+func (h *assetsHandler) Import(w http.ResponseWriter, r *http.Request) {
 
-	responder := respond.NewGoJSONRestResponder(w)
+	responder := respond.NewNetHTTPResponder(w)
 
-	session := r.Header.Get("session")
-	if len(session) == 0 {
-		responder.BadRequest("マネーフォワードにアクセスするために必要なセッション情報が入力されていません")
+	file, _, err := r.FormFile("report")
+
+	if err != nil {
+		responder.BadRequest(err.Error())
 		return
 	}
-	err := h.usecase.Import(session)
+
+	err = h.usecase.Import(file)
 	if err != nil {
 		responder.InternalServerError(err.Error())
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.WriteJson(nil)
+
+	responder.Success(nil)
 }
 
 func (h *assetsHandler) GetAll(w rest.ResponseWriter, r *rest.Request) {
