@@ -61,11 +61,11 @@ func (h *assetsHandler) GetAll(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 	ret := []*assetsToJSON{}
-	for _, t := range assets {
+	for _, a := range assets {
 		r := *&assetsToJSON{
-			Name:   t.GetName(),
-			Amount: t.GetAmount(),
-			Bank:   t.GetBank(),
+			Name:   a.Name(),
+			Amount: a.Amount(),
+			Bank:   a.Bank(),
 		}
 		ret = append(ret, &r)
 	}

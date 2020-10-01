@@ -16,8 +16,8 @@ func NewAssets() *Assets {
 	return &Assets{}
 }
 
-// GetName 名称を返す
-func (a *Assets) GetName() string {
+// Name 名称を返す
+func (a *Assets) Name() string {
 	return a.name
 }
 
@@ -30,8 +30,8 @@ func (a *Assets) SetName(value string) error {
 	return nil
 }
 
-// GetAmount 残高を返す
-func (a *Assets) GetAmount() int {
+// Amount 残高を返す
+func (a *Assets) Amount() int {
 	return a.amount
 }
 
@@ -44,8 +44,8 @@ func (a *Assets) SetAmount(value int) error {
 	return nil
 }
 
-// GetBank 金融機関を返す
-func (a *Assets) GetBank() string {
+// Bank 金融機関を返す
+func (a *Assets) Bank() string {
 	return a.bank
 }
 

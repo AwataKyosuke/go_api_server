@@ -28,7 +28,7 @@ func NewAssetsUseCase(repository repository.IAssetsRepository, service service.I
 }
 
 func (u *assetsUseCase) Import(file multipart.File) error {
-	assets, err := u.service.SearchFromHtml(file)
+	assets, err := u.service.SearchFromHTML(file)
 	if err != nil {
 		return err
 	}

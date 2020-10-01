@@ -19,6 +19,7 @@ type historyHandler struct {
 	usecase usecase.IHistoryUseCase
 }
 
+// NewHistoryHandler コンストラクタ
 func NewHistoryHandler(usecase usecase.IHistoryUseCase) IHistoryHandler {
 	return &historyHandler{
 		usecase: usecase,
@@ -67,13 +68,13 @@ func (h historyHandler) GetAll(w rest.ResponseWriter, r *rest.Request) {
 	ret := []*historiesToJSON{}
 	for _, h := range histories {
 		r := *&historiesToJSON{
-			Date:       h.GetDate(),
-			Content:    h.GetContent(),
-			Amount:     h.GetAmount(),
-			Bank:       h.GetBank(),
-			MajorType:  h.GetMajorType(),
-			MediumType: h.GetMediumType(),
-			Memo:       h.GetMediumType(),
+			Date:       h.Date(),
+			Content:    h.Content(),
+			Amount:     h.Amount(),
+			Bank:       h.Bank(),
+			MajorType:  h.MajorType(),
+			MediumType: h.MediumType(),
+			Memo:       h.MediumType(),
 		}
 		ret = append(ret, &r)
 	}

@@ -5,7 +5,7 @@ import (
 	"github.com/AwataKyosuke/go_api_server/domain/repository"
 )
 
-// UserUseCase ユースケースを定義するインターフェース
+// IUserUseCase ユースケースを定義するインターフェース
 type IUserUseCase interface {
 	GetAll() ([]*model.User, error)
 	GetUserByID(userID int) (*model.User, error)

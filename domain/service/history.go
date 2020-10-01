@@ -13,16 +13,18 @@ import (
 
 // IHistoryService 必要なサービスを定義したインターフェース
 type IHistoryService interface {
-	SearchFromHtml(multipart.File) ([]*model.History, error)
+	SearchFromHTML(multipart.File) ([]*model.History, error)
 }
 
 type service struct{}
 
+// NewHistoryService コンストラクタ
 func NewHistoryService() IHistoryService {
 	return &service{}
 }
 
-func (s service) SearchFromHtml(file multipart.File) ([]*model.History, error) {
+// SearchFromHTML HTMLファイルから必要な履歴情報を取得する
+func (s service) SearchFromHTML(file multipart.File) ([]*model.History, error) {
 
 	// HTMLドキュメントの読み込み
 	doc, err := goquery.NewDocumentFromReader(file)

@@ -26,6 +26,7 @@ type history struct {
 	UpdatedUser string
 }
 
+// NewHistoryRepository コンストラクタ
 func NewHistoryRepository() repository.IHistoryRepository {
 	return &historyRepository{}
 }
@@ -40,13 +41,13 @@ func (h *historyRepository) Insert(data []*model.History) error {
 	for _, d := range data {
 		history := &history{
 			ID:          0,
-			Date:        d.GetDate(),
-			Content:     d.GetContent(),
-			Amount:      d.GetAmount(),
-			Bank:        d.GetBank(),
-			MajorType:   d.GetMajorType(),
-			MediumType:  d.GetMediumType(),
-			Memo:        d.GetMemo(),
+			Date:        d.Date(),
+			Content:     d.Content(),
+			Amount:      d.Amount(),
+			Bank:        d.Bank(),
+			MajorType:   d.MajorType(),
+			MediumType:  d.MediumType(),
+			Memo:        d.Memo(),
 			DeleteFlag:  false,
 			CreatedAt:   time.Now(),
 			CreatedUser: "todo",

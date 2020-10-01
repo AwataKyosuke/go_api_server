@@ -13,7 +13,7 @@ import (
 
 // IAssetsService 必要なサービスを定義するインターフェース
 type IAssetsService interface {
-	SearchFromHtml(multipart.File) ([]*model.Assets, error)
+	SearchFromHTML(multipart.File) ([]*model.Assets, error)
 }
 
 type assetsService struct{}
@@ -23,7 +23,8 @@ func NewAssetsService() IAssetsService {
 	return &assetsService{}
 }
 
-func (s *assetsService) SearchFromHtml(file multipart.File) ([]*model.Assets, error) {
+// SearchFromHtml HTMLファイルから必要な資産情報を取得する
+func (s *assetsService) SearchFromHTML(file multipart.File) ([]*model.Assets, error) {
 
 	// HTMLドキュメントの読み込み
 	doc, err := goquery.NewDocumentFromReader(file)

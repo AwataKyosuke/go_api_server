@@ -19,6 +19,7 @@ type historyUseCase struct {
 	service    service.IHistoryService
 }
 
+// NewHistoryUseCase コンストラクタ
 func NewHistoryUseCase(repository repository.IHistoryRepository, service service.IHistoryService) IHistoryUseCase {
 	return &historyUseCase{
 		repository: repository,
@@ -27,7 +28,7 @@ func NewHistoryUseCase(repository repository.IHistoryRepository, service service
 }
 
 func (u historyUseCase) Import(file multipart.File) error {
-	histories, err := u.service.SearchFromHtml(file)
+	histories, err := u.service.SearchFromHTML(file)
 	if err != nil {
 		return err
 	}

@@ -7,7 +7,8 @@ import (
 	"github.com/ant0ine/go-json-rest/rest"
 )
 
-type Responder interface {
+// IResponder レスポンスを返す際に使用する処理を定義するインターフェース
+type IResponder interface {
 	Success(json interface{})
 	InternalServerError(message string)
 	BadRequest(message string)
@@ -32,7 +33,8 @@ type errorResponse struct {
 	Message string
 }
 
-func NewNetHTTPResponder(w http.ResponseWriter) Responder {
+// NewNetHTTPResponder net/httpパッケージを使う際のレスポンダー
+func NewNetHTTPResponder(w http.ResponseWriter) IResponder {
 	return &netHTTPReponder{
 		writer:   w,
 		response: response{},
@@ -82,7 +84,8 @@ func (n *netHTTPReponder) BadRequest(message string) {
 	n.writer.Write(res)
 }
 
-func NewGoJSONRestResponder(w rest.ResponseWriter) Responder {
+// NewGoJSONRestResponder go-json-restパッケージを使う際のレスポンダー
+func NewGoJSONRestResponder(w rest.ResponseWriter) IResponder {
 	return &goJSONRestResponder{
 		writer:   w,
 		response: response{},

@@ -38,9 +38,9 @@ func (a *assetsRepository) Insert(data []*model.Assets) error {
 	for _, d := range data {
 		assets := &assets{
 			ID:          0,
-			Name:        d.GetName(),
-			Amount:      d.GetAmount(),
-			Bank:        d.GetBank(),
+			Name:        d.Name(),
+			Amount:      d.Amount(),
+			Bank:        d.Bank(),
 			DeleteFlag:  false,
 			CreatedAt:   time.Now(),
 			CreatedUser: "todo",
